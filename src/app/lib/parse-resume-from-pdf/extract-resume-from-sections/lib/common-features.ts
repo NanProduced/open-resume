@@ -13,6 +13,13 @@ export const hasOnlyLettersSpacesAmpersands = (item: TextItem) =>
 export const hasLetterAndIsAllUpperCase = (item: TextItem) =>
   hasLetter(item) && item.text.toUpperCase() === item.text;
 
+export const hasChinese = (item: TextItem) =>
+  /[\u4e00-\u9fff]/.test(item.text);
+export const hasOnlyChineseLettersSpaces = (item: TextItem) =>
+  /^[\u4e00-\u9fff\s&·]+$/.test(item.text);
+export const hasChineseOrLetter = (item: TextItem) =>
+  hasChinese(item) || hasLetter(item);
+
 // Date Features
 const hasYear = (item: TextItem) => /(?:19|20)\d{2}/.test(item.text);
 // prettier-ignore
