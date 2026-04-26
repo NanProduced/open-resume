@@ -12,8 +12,9 @@ import type {
   ResumeDiff,
   DiffType,
 } from "lib/history/types";
+import type { ItemId } from "lib/redux/types";
 
-const generateItemId = (obj: any, index: number): string => {
+const generateContentHashId = (obj: any, index: number): string => {
   const str = JSON.stringify(obj);
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
@@ -22,6 +23,13 @@ const generateItemId = (obj: any, index: number): string => {
     hash = hash & hash;
   }
   return `${index}-${Math.abs(hash).toString(36)}`;
+};
+
+const getItemStableId = (obj: any, index: number): ItemId => {
+  if (obj && typeof obj === "object" && "id" in obj && obj.id) {
+    return obj.id;
+  }
+  return generateContentHashId(obj, index);
 };
 
 const deepEqual = (a: any, b: any): boolean => {
@@ -143,12 +151,12 @@ export const diffArrayItems = <T extends Record<string, any>>(
   newArray: T[]
 ): ArrayItemDiff<T>[] => {
   const oldItems = (oldArray || []).map((item, idx) => ({
-    id: generateItemId(item, idx),
+    id: getItemStableId(item, idx),
     item,
     index: idx,
   }));
   const newItems = (newArray || []).map((item, idx) => ({
-    id: generateItemId(item, idx),
+    id: getItemStableId(item, idx),
     item,
     index: idx,
   }));

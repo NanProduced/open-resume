@@ -9,7 +9,11 @@ import {
   loadStateFromLocalStorage,
   saveStateToLocalStorage,
 } from "lib/redux/local-storage";
-import { initialResumeState, setResume } from "lib/redux/resumeSlice";
+import {
+  initialResumeState,
+  setResume,
+  migrateResumeWithIds,
+} from "lib/redux/resumeSlice";
 import {
   initialSettings,
   setSettings,
@@ -46,7 +50,9 @@ export const useSetInitialStore = () => {
         initialResumeState,
         state.resume
       ) as Resume;
-      dispatch(setResume(mergedResumeState));
+      // Migrate to add stable IDs for array items
+      const migratedResumeState = migrateResumeWithIds(mergedResumeState);
+      dispatch(setResume(migratedResumeState));
     }
     if (state.settings) {
       const mergedSettingsState = deepMerge(
