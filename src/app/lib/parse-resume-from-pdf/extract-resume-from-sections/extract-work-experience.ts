@@ -21,6 +21,8 @@ import {
 // prettier-ignore
 const WORK_EXPERIENCE_KEYWORDS_LOWERCASE = ['work', 'experience', 'employment', 'history', 'job'];
 // prettier-ignore
+const WORK_EXPERIENCE_KEYWORDS_CHINESE = ['工作', '经验', '经历', '职业', '实习'];
+// prettier-ignore
 const JOB_TITLES = ['Accountant', 'Administrator', 'Advisor', 'Agent', 'Analyst', 'Apprentice', 'Architect', 'Assistant', 'Associate', 'Auditor', 'Bartender', 'Biologist', 'Bookkeeper', 'Buyer', 'Carpenter', 'Cashier', 'CEO', 'Clerk', 'Co-op', 'Co-Founder', 'Consultant', 'Coordinator', 'CTO', 'Developer', 'Designer', 'Director', 'Driver', 'Editor', 'Electrician', 'Engineer', 'Extern', 'Founder', 'Freelancer', 'Head', 'Intern', 'Janitor', 'Journalist', 'Laborer', 'Lawyer', 'Lead', 'Manager', 'Mechanic', 'Member', 'Nurse', 'Officer', 'Operator', 'Operation', 'Photographer', 'President', 'Producer', 'Recruiter', 'Representative', 'Researcher', 'Sales', 'Server', 'Scientist', 'Specialist', 'Supervisor', 'Teacher', 'Technician', 'Trader', 'Trainee', 'Treasurer', 'Tutor', 'Vice', 'VP', 'Volunteer', 'Webmaster', 'Worker'];
 
 const hasJobTitle = (item: TextItem) =>
@@ -34,13 +36,15 @@ const JOB_TITLE_FEATURE_SET: FeatureSet[] = [
   [hasMoreThan5Words, -2],
 ];
 
+const ALL_WORK_EXPERIENCE_KEYWORDS = [
+  ...WORK_EXPERIENCE_KEYWORDS_LOWERCASE,
+  ...WORK_EXPERIENCE_KEYWORDS_CHINESE,
+];
+
 export const extractWorkExperience = (sections: ResumeSectionToLines) => {
   const workExperiences: ResumeWorkExperience[] = [];
   const workExperiencesScores = [];
-  const lines = getSectionLinesByKeywords(
-    sections,
-    WORK_EXPERIENCE_KEYWORDS_LOWERCASE
-  );
+  const lines = getSectionLinesByKeywords(sections, ALL_WORK_EXPERIENCE_KEYWORDS);
   const subsections = divideSectionIntoSubsections(lines);
 
   for (const subsectionLines of subsections) {

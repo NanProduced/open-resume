@@ -1,11 +1,14 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
 
+export type Language = "en" | "zh";
+
 export interface Settings {
   themeColor: string;
   fontFamily: string;
   fontSize: string;
   documentSize: string;
+  language: Language;
   formToShow: {
     workExperiences: boolean;
     educations: boolean;
@@ -33,19 +36,38 @@ export type ShowForm = keyof Settings["formToShow"];
 export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
 export type GeneralSetting = Exclude<
   keyof Settings,
-  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
+  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints" | "language"
 >;
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
 export const DEFAULT_FONT_FAMILY = "Roboto";
+export const DEFAULT_FONT_FAMILY_ZH = "NotoSansSC";
 export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs/font-size
 export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
+export const DEFAULT_LANGUAGE: Language = "en";
 
-export const initialSettings: Settings = {
+export const CHINESE_FORM_HEADINGS: Settings["formToHeading"] = {
+  workExperiences: "工作经历",
+  educations: "教育背景",
+  projects: "项目经验",
+  skills: "专业技能",
+  custom: "自定义",
+};
+
+export const ENGLISH_FORM_HEADINGS: Settings["formToHeading"] = {
+  workExperiences: "WORK EXPERIENCE",
+  educations: "EDUCATION",
+  projects: "PROJECT",
+  skills: "SKILLS",
+  custom: "CUSTOM SECTION",
+};
+
+const createInitialSettings = (language: Language = DEFAULT_LANGUAGE): Settings => ({
   themeColor: DEFAULT_THEME_COLOR,
-  fontFamily: DEFAULT_FONT_FAMILY,
+  fontFamily: language === "zh" ? DEFAULT_FONT_FAMILY_ZH : DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
   documentSize: "Letter",
+  language,
   formToShow: {
     workExperiences: true,
     educations: true,
@@ -53,13 +75,9 @@ export const initialSettings: Settings = {
     skills: true,
     custom: false,
   },
-  formToHeading: {
-    workExperiences: "WORK EXPERIENCE",
-    educations: "EDUCATION",
-    projects: "PROJECT",
-    skills: "SKILLS",
-    custom: "CUSTOM SECTION",
-  },
+  formToHeading: language === "zh"
+    ? { ...CHINESE_FORM_HEADINGS }
+    : { ...ENGLISH_FORM_HEADINGS },
   formsOrder: ["workExperiences", "educations", "projects", "skills", "custom"],
   showBulletPoints: {
     educations: true,
@@ -67,7 +85,9 @@ export const initialSettings: Settings = {
     skills: true,
     custom: true,
   },
-};
+});
+
+export const initialSettings: Settings = createInitialSettings();
 
 export const settingsSlice = createSlice({
   name: "settings",
@@ -121,6 +141,14 @@ export const settingsSlice = createSlice({
       const { field, value } = action.payload;
       draft["showBulletPoints"][field] = value;
     },
+    changeLanguage: (draft, action: PayloadAction<Language>) => {
+      const language = action.payload;
+      draft.language = language;
+      draft.fontFamily = language === "zh" ? DEFAULT_FONT_FAMILY_ZH : DEFAULT_FONT_FAMILY;
+      draft.formToHeading = language === "zh"
+        ? { ...CHINESE_FORM_HEADINGS }
+        : { ...ENGLISH_FORM_HEADINGS };
+    },
     setSettings: (draft, action: PayloadAction<Settings>) => {
       return action.payload;
     },
@@ -133,11 +161,13 @@ export const {
   changeFormHeading,
   changeFormOrder,
   changeShowBulletPoints,
+  changeLanguage,
   setSettings,
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;
 export const selectThemeColor = (state: RootState) => state.settings.themeColor;
+export const selectLanguage = (state: RootState) => state.settings.language;
 
 export const selectFormToShow = (state: RootState) => state.settings.formToShow;
 export const selectShowByForm = (form: ShowForm) => (state: RootState) =>

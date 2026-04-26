@@ -16,10 +16,12 @@ import {
   getDescriptionsLineIdx,
 } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/bullet-points";
 
+const PROJECT_KEYWORDS = ["project", "项目"];
+
 export const extractProject = (sections: ResumeSectionToLines) => {
   const projects: ResumeProject[] = [];
   const projectsScores = [];
-  const lines = getSectionLinesByKeywords(sections, ["project"]);
+  const lines = getSectionLinesByKeywords(sections, PROJECT_KEYWORDS);
   const subsections = divideSectionIntoSubsections(lines);
 
   for (const subsectionLines of subsections) {

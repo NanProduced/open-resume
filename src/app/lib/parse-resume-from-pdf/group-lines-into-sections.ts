@@ -5,7 +5,9 @@ import type {
   ResumeSectionToLines,
 } from "lib/parse-resume-from-pdf/types";
 import {
+  hasChinese,
   hasLetterAndIsAllUpperCase,
+  hasOnlyChineseLettersSpaces,
   hasOnlyLettersSpacesAmpersands,
   isBold,
 } from "lib/parse-resume-from-pdf/extract-resume-from-sections/lib/common-features";
@@ -52,7 +54,7 @@ const SECTION_TITLE_SECONDARY_KEYWORDS = [
   "course",
   "extracurricular",
   "objective",
-  "summary", // LinkedIn generated resume has a summary section
+  "summary",
   "award",
   "honor",
   "project",
@@ -60,6 +62,33 @@ const SECTION_TITLE_SECONDARY_KEYWORDS = [
 const SECTION_TITLE_KEYWORDS = [
   ...SECTION_TITLE_PRIMARY_KEYWORDS,
   ...SECTION_TITLE_SECONDARY_KEYWORDS,
+];
+
+const CHINESE_SECTION_TITLE_PRIMARY_KEYWORDS = [
+  "工作",
+  "经验",
+  "经历",
+  "教育",
+  "背景",
+  "项目",
+  "技能",
+  "专业",
+];
+const CHINESE_SECTION_TITLE_SECONDARY_KEYWORDS = [
+  "个人",
+  "信息",
+  "简介",
+  "介绍",
+  "自我评价",
+  "获奖",
+  "荣誉",
+  "证书",
+  "培训",
+  "课程",
+];
+const CHINESE_SECTION_TITLE_KEYWORDS = [
+  ...CHINESE_SECTION_TITLE_PRIMARY_KEYWORDS,
+  ...CHINESE_SECTION_TITLE_SECONDARY_KEYWORDS,
 ];
 
 const isSectionTitle = (line: Line, lineNumber: number) => {
@@ -71,16 +100,29 @@ const isSectionTitle = (line: Line, lineNumber: number) => {
   }
 
   const textItem = line[0];
+  const text = textItem.text.trim();
 
-  // The main heuristic to determine a section title is to check if the text is double emphasized
-  // to be both bold and all uppercase, which is generally true for a well formatted resume
+  // For Chinese resumes: bold text with Chinese characters is likely a section title
+  if (isBold(textItem) && hasChinese(textItem)) {
+    return true;
+  }
+
+  // The main heuristic for English resumes: check if the text is both bold and all uppercase
   if (isBold(textItem) && hasLetterAndIsAllUpperCase(textItem)) {
     return true;
   }
 
-  // The following is a fallback heuristic to detect section title if it includes a keyword match
-  // (This heuristics is not well tested and may not work well)
-  const text = textItem.text.trim();
+  // Fallback heuristic for Chinese: check if it contains Chinese section title keywords
+  if (hasChinese(textItem)) {
+    if (
+      hasOnlyChineseLettersSpaces(textItem) &&
+      CHINESE_SECTION_TITLE_KEYWORDS.some((keyword) => text.includes(keyword))
+    ) {
+      return true;
+    }
+  }
+
+  // Fallback heuristic for English: check if it includes a keyword match
   const textHasAtMost2Words =
     text.split(" ").filter((s) => s !== "&").length <= 2;
   const startsWithCapitalLetter = /[A-Z]/.test(text.slice(0, 1));

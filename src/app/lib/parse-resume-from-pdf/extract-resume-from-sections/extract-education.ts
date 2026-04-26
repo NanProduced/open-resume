@@ -27,12 +27,18 @@ import {
 
 // prettier-ignore
 const SCHOOLS = ['College', 'University', 'Institute', 'School', 'Academy', 'BASIS', 'Magnet']
+// prettier-ignore
+const SCHOOLS_CHINESE = ['大学', '学院', '学校', '中学', '高中', '研究院', '研究所'];
 const hasSchool = (item: TextItem) =>
-  SCHOOLS.some((school) => item.text.includes(school));
+  SCHOOLS.some((school) => item.text.includes(school)) ||
+  SCHOOLS_CHINESE.some((school) => item.text.includes(school));
 // prettier-ignore
 const DEGREES = ["Associate", "Bachelor", "Master", "PhD", "Ph."];
+// prettier-ignore
+const DEGREES_CHINESE = ['学士', '硕士', '博士', '本科', '专科'];
 const hasDegree = (item: TextItem) =>
   DEGREES.some((degree) => item.text.includes(degree)) ||
+  DEGREES_CHINESE.some((degree) => item.text.includes(degree)) ||
   /[ABM][A-Z\.]/.test(item.text); // Match AA, B.S., MBA, etc.
 const matchGPA = (item: TextItem) => item.text.match(/[0-4]\.\d{1,2}/);
 const matchGrade = (item: TextItem) => {
@@ -62,10 +68,13 @@ const GPA_FEATURE_SETS: FeatureSet[] = [
   [hasLetter, -4],
 ];
 
+const EDUCATION_KEYWORDS = ["education", "教育", "学历", "学校"];
+const COURSE_KEYWORDS = ["course", "课程"];
+
 export const extractEducation = (sections: ResumeSectionToLines) => {
   const educations: ResumeEducation[] = [];
   const educationsScores = [];
-  const lines = getSectionLinesByKeywords(sections, ["education"]);
+  const lines = getSectionLinesByKeywords(sections, EDUCATION_KEYWORDS);
   const subsections = divideSectionIntoSubsections(lines);
   for (const subsectionLines of subsections) {
     const textItems = subsectionLines.flat();
@@ -103,7 +112,7 @@ export const extractEducation = (sections: ResumeSectionToLines) => {
   }
 
   if (educations.length !== 0) {
-    const coursesLines = getSectionLinesByKeywords(sections, ["course"]);
+    const coursesLines = getSectionLinesByKeywords(sections, COURSE_KEYWORDS);
     if (coursesLines.length !== 0) {
       educations[0].descriptions.push(
         "Courses: " +
