@@ -15,6 +15,7 @@ import { ThemeForm } from "components/ResumeForm/ThemeForm";
 import { CustomForm } from "components/ResumeForm/CustomForm";
 import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { cx } from "lib/cx";
+import { useInitializeHistory, useAutoSnapshot } from "lib/history";
 
 const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
   workExperiences: WorkExperiencesForm,
@@ -27,6 +28,8 @@ const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
 export const ResumeForm = () => {
   useSetInitialStore();
   useSaveStateToLocalStorageOnChange();
+  useInitializeHistory();
+  useAutoSnapshot();
 
   const formsOrder = useAppSelector(selectFormsOrder);
   const [isHover, setIsHover] = useState(false);
