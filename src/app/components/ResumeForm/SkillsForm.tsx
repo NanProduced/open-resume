@@ -1,3 +1,4 @@
+"use client";
 import { Form } from "components/ResumeForm/Form";
 import {
   BulletListTextarea,
@@ -12,6 +13,7 @@ import {
   changeShowBulletPoints,
   selectThemeColor,
 } from "lib/redux/settingsSlice";
+import { useTranslation } from "lib/i18n";
 
 export const SkillsForm = () => {
   const skills = useAppSelector(selectSkills);
@@ -20,6 +22,7 @@ export const SkillsForm = () => {
   const form = "skills";
   const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
   const themeColor = useAppSelector(selectThemeColor) || "#38bdf8";
+  const { t } = useTranslation();
 
   const handleSkillsChange = (field: "descriptions", value: string[]) => {
     dispatch(changeSkills({ field, value }));
@@ -40,10 +43,10 @@ export const SkillsForm = () => {
       <div className="col-span-full grid grid-cols-6 gap-3">
         <div className="relative col-span-full">
           <BulletListTextarea
-            label="Skills List"
+            label={t.resumeForm.skills.skillsList}
             labelClassName="col-span-full"
             name="descriptions"
-            placeholder="Bullet points"
+            placeholder={t.resumeForm.skills.skillsListPlaceholder}
             value={descriptions}
             onChange={handleSkillsChange}
             showBulletPoints={showBulletPoints}
@@ -57,12 +60,11 @@ export const SkillsForm = () => {
         </div>
         <div className="col-span-full mb-4 mt-6 border-t-2 border-dotted border-gray-200" />
         <InputGroupWrapper
-          label="Featured Skills (Optional)"
+          label={t.resumeForm.skills.featuredSkills}
           className="col-span-full"
         >
           <p className="mt-2 text-sm font-normal text-gray-600">
-            Featured skills is optional to highlight top skills, with more
-            circles mean higher proficiency.
+            {t.resumeForm.skills.featuredSkillsDesc}
           </p>
         </InputGroupWrapper>
 
@@ -75,7 +77,7 @@ export const SkillsForm = () => {
             setSkillRating={(newSkill, newRating) => {
               handleFeaturedSkillsChange(idx, newSkill, newRating);
             }}
-            placeholder={`Featured Skill ${idx + 1}`}
+            placeholder={`${t.resumeForm.skills.featuredSkillPlaceholder} ${idx + 1}`}
             circleColor={themeColor}
           />
         ))}

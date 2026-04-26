@@ -44,6 +44,7 @@ export interface Translation {
     priorSessionData: string;
     continueWhereLeft: string;
     overrideWithNew: string;
+    or: string;
   };
   resumeParser: {
     playgroundTitle: string;
@@ -53,6 +54,27 @@ export interface Translation {
     addYourResume: string;
     parserDesc: string;
     parsingResults: string;
+  };
+  parserTable: {
+    profile: string;
+    name: string;
+    email: string;
+    phone: string;
+    location: string;
+    link: string;
+    summary: string;
+    education: string;
+    school: string;
+    degree: string;
+    gpa: string;
+    date: string;
+    descriptions: string;
+    workExperience: string;
+    company: string;
+    jobTitle: string;
+    projects: string;
+    project: string;
+    skills: string;
   };
   resumeForm: {
     settingsTitle: string;
@@ -99,8 +121,8 @@ export interface Translation {
       gpaPlaceholder: string;
       date: string;
       datePlaceholder: string;
-      description: string;
-      descriptionPlaceholder: string;
+      additionalInfo: string;
+      additionalInfoPlaceholder: string;
       deleteTooltip: string;
     };
     project: {
@@ -114,12 +136,23 @@ export interface Translation {
       deleteTooltip: string;
     };
     skills: {
-      description: string;
-      descriptionPlaceholder: string;
+      skillsList: string;
+      skillsListPlaceholder: string;
+      featuredSkills: string;
+      featuredSkillsDesc: string;
+      featuredSkillPlaceholder: string;
     };
     custom: {
-      description: string;
+      customTextbox: string;
       descriptionPlaceholder: string;
+    };
+    tooltips: {
+      hideSection: string;
+      showSection: string;
+      moveUp: string;
+      moveDown: string;
+      hideBulletPoints: string;
+      showBulletPoints: string;
     };
   };
   dropzone: {
@@ -129,6 +162,10 @@ export interface Translation {
     onlyPdfSupported: string;
     importAndContinue: string;
     bestWithSingleColumn: string;
+  };
+  controlBar: {
+    autoscale: string;
+    downloadResume: string;
   };
 }
 
@@ -177,6 +214,7 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       priorSessionData: "You have data saved in browser from prior session",
       continueWhereLeft: "Continue where I left off",
       overrideWithNew: "Override data with a new resume",
+      or: "or",
     },
     resumeParser: {
       playgroundTitle: "Resume Parser Playground",
@@ -186,6 +224,27 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       parserDesc: "to access how well your resume would be parsed by similar Application Tracking Systems (ATS) used in job applications. The more information it can parse out, the better it indicates the resume is well formatted and easy to read. It is beneficial to have the name and email accurately parsed at the very least.",
       parsingResults: "Resume Parsing Results",
       resumeExample: "Resume Example",
+    },
+    parserTable: {
+      profile: "Profile",
+      name: "Name",
+      email: "Email",
+      phone: "Phone",
+      location: "Location",
+      link: "Link",
+      summary: "Summary",
+      education: "Education",
+      school: "School",
+      degree: "Degree",
+      gpa: "GPA",
+      date: "Date",
+      descriptions: "Descriptions",
+      workExperience: "Work Experience",
+      company: "Company",
+      jobTitle: "Job Title",
+      projects: "Projects",
+      project: "Project",
+      skills: "Skills",
     },
     resumeForm: {
       settingsTitle: "Resume Setting",
@@ -232,8 +291,8 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         gpaPlaceholder: "3.9",
         date: "Date",
         datePlaceholder: "Jun 2018",
-        description: "Description",
-        descriptionPlaceholder: "Bullet points",
+        additionalInfo: "Additional Information (Optional)",
+        additionalInfoPlaceholder: "Free paragraph space to list out additional activities, courses, awards etc",
         deleteTooltip: "Delete school",
       },
       project: {
@@ -247,12 +306,23 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         deleteTooltip: "Delete project",
       },
       skills: {
-        description: "Description",
-        descriptionPlaceholder: "Bullet points",
+        skillsList: "Skills List",
+        skillsListPlaceholder: "Bullet points",
+        featuredSkills: "Featured Skills (Optional)",
+        featuredSkillsDesc: "Featured skills is optional to highlight top skills, with more circles mean higher proficiency.",
+        featuredSkillPlaceholder: "Featured Skill",
       },
       custom: {
-        description: "Description",
+        customTextbox: "Custom Textbox",
         descriptionPlaceholder: "Bullet points",
+      },
+      tooltips: {
+        hideSection: "Hide section",
+        showSection: "Show section",
+        moveUp: "Move up",
+        moveDown: "Move down",
+        hideBulletPoints: "Hide bullet points",
+        showBulletPoints: "Show bullet points",
       },
     },
     dropzone: {
@@ -262,6 +332,10 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       onlyPdfSupported: "Only pdf file is supported",
       importAndContinue: "Import and Continue",
       bestWithSingleColumn: "Note: Import works best on single column resume",
+    },
+    controlBar: {
+      autoscale: "Autoscale",
+      downloadResume: "Download Resume",
     },
   },
   zh: {
@@ -308,6 +382,7 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       priorSessionData: "您之前的会话数据已保存在浏览器中",
       continueWhereLeft: "继续上次编辑",
       overrideWithNew: "使用新简历覆盖数据",
+      or: "或",
     },
     resumeParser: {
       playgroundTitle: "简历解析器演示",
@@ -317,6 +392,27 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       parserDesc: "来评估您的简历在求职申请中被类似的申请跟踪系统（ATS）解析的效果。能解析出的信息越多，说明简历格式越好、越易读。至少确保姓名和邮箱能够被准确解析。",
       parsingResults: "简历解析结果",
       resumeExample: "简历示例",
+    },
+    parserTable: {
+      profile: "个人信息",
+      name: "姓名",
+      email: "邮箱",
+      phone: "电话",
+      location: "所在地",
+      link: "链接",
+      summary: "简介",
+      education: "教育背景",
+      school: "学校",
+      degree: "学位",
+      gpa: "GPA",
+      date: "日期",
+      descriptions: "描述",
+      workExperience: "工作经历",
+      company: "公司",
+      jobTitle: "职位",
+      projects: "项目",
+      project: "项目",
+      skills: "技能",
     },
     resumeForm: {
       settingsTitle: "简历设置",
@@ -363,8 +459,8 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         gpaPlaceholder: "3.9",
         date: "日期",
         datePlaceholder: "2018年6月",
-        description: "描述",
-        descriptionPlaceholder: "项目要点",
+        additionalInfo: "附加信息（可选）",
+        additionalInfoPlaceholder: "自由填写区域，可列出额外活动、课程、奖项等",
         deleteTooltip: "删除教育经历",
       },
       project: {
@@ -378,12 +474,23 @@ export const TRANSLATIONS: Record<Language, Translation> = {
         deleteTooltip: "删除项目经历",
       },
       skills: {
-        description: "描述",
-        descriptionPlaceholder: "项目要点",
+        skillsList: "技能列表",
+        skillsListPlaceholder: "项目要点",
+        featuredSkills: "重点技能（可选）",
+        featuredSkillsDesc: "重点技能用于突出核心技能，圆圈越多表示熟练程度越高。",
+        featuredSkillPlaceholder: "重点技能",
       },
       custom: {
-        description: "描述",
+        customTextbox: "自定义文本框",
         descriptionPlaceholder: "项目要点",
+      },
+      tooltips: {
+        hideSection: "隐藏分区",
+        showSection: "显示分区",
+        moveUp: "上移",
+        moveDown: "下移",
+        hideBulletPoints: "隐藏项目符号",
+        showBulletPoints: "显示项目符号",
       },
     },
     dropzone: {
@@ -393,6 +500,10 @@ export const TRANSLATIONS: Record<Language, Translation> = {
       onlyPdfSupported: "仅支持PDF文件",
       importAndContinue: "导入并继续",
       bestWithSingleColumn: "注意：导入功能在单栏简历上效果最佳",
+    },
+    controlBar: {
+      autoscale: "自动缩放",
+      downloadResume: "下载简历",
     },
   },
 };

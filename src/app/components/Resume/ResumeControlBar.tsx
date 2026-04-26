@@ -7,6 +7,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { usePDF } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
+import { useTranslation } from "lib/i18n";
 
 const ResumeControlBar = ({
   scale,
@@ -25,10 +26,10 @@ const ResumeControlBar = ({
     setScale,
     documentSize,
   });
+  const { t } = useTranslation();
 
   const [instance, update] = usePDF({ document });
 
-  // Hook to update pdf when document changes
   useEffect(() => {
     update();
   }, [update, document]);
@@ -56,7 +57,7 @@ const ResumeControlBar = ({
             checked={scaleOnResize}
             onChange={() => setScaleOnResize((prev) => !prev)}
           />
-          <span className="select-none">Autoscale</span>
+          <span className="select-none">{t.controlBar.autoscale}</span>
         </label>
       </div>
       <a
@@ -65,7 +66,7 @@ const ResumeControlBar = ({
         download={fileName}
       >
         <ArrowDownTrayIcon className="h-4 w-4" />
-        <span className="whitespace-nowrap">Download Resume</span>
+        <span className="whitespace-nowrap">{t.controlBar.downloadResume}</span>
       </a>
     </div>
   );

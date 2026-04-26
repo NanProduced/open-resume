@@ -1,3 +1,4 @@
+"use client";
 import { BaseForm } from "components/ResumeForm/Form";
 import { InputGroupWrapper } from "components/ResumeForm/Form/InputGroup";
 import { THEME_COLORS } from "components/ResumeForm/ThemeForm/constants";
@@ -12,12 +13,12 @@ import {
   DEFAULT_THEME_COLOR,
   selectSettings,
   type GeneralSetting,
-  changeLanguage,
   type Language,
 } from "lib/redux/settingsSlice";
 import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import type { FontFamily } from "components/fonts/constants";
 import { Cog6ToothIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "lib/i18n";
 
 const LANGUAGE_OPTIONS: { value: Language; label: string; display: string }[] = [
   { value: "en", label: "English", display: "English" },
@@ -29,13 +30,14 @@ export const ThemeForm = () => {
   const { fontSize, fontFamily, documentSize, language } = settings;
   const themeColor = settings.themeColor || DEFAULT_THEME_COLOR;
   const dispatch = useAppDispatch();
+  const { t, setLanguage } = useTranslation();
 
   const handleSettingsChange = (field: GeneralSetting, value: string) => {
     dispatch(changeSettings({ field, value }));
   };
 
   const handleLanguageChange = (newLanguage: Language) => {
-    dispatch(changeLanguage(newLanguage));
+    setLanguage(newLanguage);
   };
 
   return (
@@ -44,11 +46,11 @@ export const ThemeForm = () => {
         <div className="flex items-center gap-2">
           <Cog6ToothIcon className="h-6 w-6 text-gray-600" aria-hidden="true" />
           <h1 className="text-lg font-semibold tracking-wide text-gray-900 ">
-            Resume Setting
+            {t.resumeForm.settingsTitle}
           </h1>
         </div>
         <div>
-          <InputGroupWrapper label="Language" />
+          <InputGroupWrapper label={t.resumeForm.language} />
           <div className="flex flex-wrap gap-2">
             {LANGUAGE_OPTIONS.map((option) => (
               <button
@@ -68,7 +70,7 @@ export const ThemeForm = () => {
         </div>
         <div>
           <InlineInput
-            label="Theme Color"
+            label={t.resumeForm.themeColor}
             name="themeColor"
             value={settings.themeColor}
             placeholder={DEFAULT_THEME_COLOR}
@@ -94,7 +96,7 @@ export const ThemeForm = () => {
           </div>
         </div>
         <div>
-          <InputGroupWrapper label="Font Family" />
+          <InputGroupWrapper label={t.resumeForm.fontFamily} />
           <FontFamilySelectionsCSR
             selectedFontFamily={fontFamily}
             themeColor={themeColor}
@@ -103,7 +105,7 @@ export const ThemeForm = () => {
         </div>
         <div>
           <InlineInput
-            label="Font Size (pt)"
+            label={t.resumeForm.fontSize}
             name="fontSize"
             value={fontSize}
             placeholder="11"
@@ -117,7 +119,7 @@ export const ThemeForm = () => {
           />
         </div>
         <div>
-          <InputGroupWrapper label="Document Size" />
+          <InputGroupWrapper label={t.resumeForm.documentSize} />
           <DocumentSizeSelections
             themeColor={themeColor}
             selectedDocumentSize={documentSize}

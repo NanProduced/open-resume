@@ -3,10 +3,12 @@ import { getHasUsedAppBefore } from "lib/redux/local-storage";
 import { ResumeDropzone } from "components/ResumeDropzone";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useTranslation } from "lib/i18n";
 
 export default function ImportResume() {
   const [hasUsedAppBefore, setHasUsedAppBefore] = useState(false);
   const [hasAddedResume, setHasAddedResume] = useState(false);
+  const { t } = useTranslation();
   const onFileUrlChange = (fileUrl: string) => {
     setHasAddedResume(Boolean(fileUrl));
   };
@@ -21,7 +23,7 @@ export default function ImportResume() {
         {!hasUsedAppBefore ? (
           <>
             <h1 className="text-lg font-semibold text-gray-900">
-              Import data from an existing resume
+              {t.resumeImport.importTitle}
             </h1>
             <ResumeDropzone
               onFileUrlChange={onFileUrlChange}
@@ -31,8 +33,8 @@ export default function ImportResume() {
               <>
                 <OrDivider />
                 <SectionWithHeadingAndCreateButton
-                  heading="Don't have a resume yet?"
-                  buttonText="Create from scratch"
+                  heading={t.resumeImport.dontHaveResume}
+                  buttonText={t.resumeImport.createFromScratch}
                 />
               </>
             )}
@@ -42,14 +44,14 @@ export default function ImportResume() {
             {!hasAddedResume && (
               <>
                 <SectionWithHeadingAndCreateButton
-                  heading="You have data saved in browser from prior session"
-                  buttonText="Continue where I left off"
+                  heading={t.resumeImport.priorSessionData}
+                  buttonText={t.resumeImport.continueWhereLeft}
                 />
                 <OrDivider />
               </>
             )}
             <h1 className="font-semibold text-gray-900">
-              Override data with a new resume
+              {t.resumeImport.overrideWithNew}
             </h1>
             <ResumeDropzone
               onFileUrlChange={onFileUrlChange}
@@ -62,13 +64,18 @@ export default function ImportResume() {
   );
 }
 
-const OrDivider = () => (
-  <div className="mx-[-2.5rem] flex items-center pb-6 pt-8" aria-hidden="true">
-    <div className="flex-grow border-t border-gray-200" />
-    <span className="mx-2 mt-[-2px] flex-shrink text-lg text-gray-400">or</span>
-    <div className="flex-grow border-t border-gray-200" />
-  </div>
-);
+const OrDivider = () => {
+  const { t } = useTranslation();
+  return (
+    <div className="mx-[-2.5rem] flex items-center pb-6 pt-8" aria-hidden="true">
+      <div className="flex-grow border-t border-gray-200" />
+      <span className="mx-2 mt-[-2px] flex-shrink text-lg text-gray-400">
+        {t.resumeImport.or}
+      </span>
+      <div className="flex-grow border-t border-gray-200" />
+    </div>
+  );
+};
 
 const SectionWithHeadingAndCreateButton = ({
   heading,
