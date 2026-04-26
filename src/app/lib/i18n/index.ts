@@ -2,22 +2,21 @@ import { useState, useEffect, useCallback } from "react";
 import { TRANSLATIONS } from "lib/i18n/translations";
 import type { Language } from "lib/redux/settingsSlice";
 import type { Translation } from "lib/i18n/translations";
-import { useAppDispatch, useAppSelector } from "lib/redux/hooks";
 import {
-  selectLanguage,
+  DEFAULT_LANGUAGE,
+  DEFAULT_FONT_FAMILY,
+  DEFAULT_FONT_FAMILY_ZH,
+  CHINESE_FORM_HEADINGS,
+  ENGLISH_FORM_HEADINGS,
   changeLanguage,
-  createInitialSettings,
-  setSettings,
 } from "lib/redux/settingsSlice";
-import {
-  loadStateFromLocalStorage,
-  saveStateToLocalStorage,
-} from "lib/redux/local-storage";
-import { DEFAULT_LANGUAGE } from "lib/redux/settingsSlice";
+import { store } from "lib/redux/store";
+import { loadStateFromLocalStorage, saveStateToLocalStorage } from "lib/redux/local-storage";
+import type { Settings } from "lib/redux/settingsSlice";
 
 const LOCAL_STORAGE_KEY = "open-resume-state";
 
-const getStoredLanguage = (): Language => {
+export const getStoredLanguage = (): Language => {
   if (typeof window === "undefined") return DEFAULT_LANGUAGE;
   try {
     const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -33,14 +32,36 @@ const getStoredLanguage = (): Language => {
   return DEFAULT_LANGUAGE;
 };
 
-const setStoredLanguage = (language: Language) => {
+export const updateStoredLanguage = (language: Language) => {
   if (typeof window === "undefined") return;
   try {
-    const stored = localStorage.getItem(LOCAL_STORAGE_KEY);
-    let state = stored ? JSON.parse(stored) : {};
-    const settings = createInitialSettings(language);
-    state.settings = settings;
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    const stored = loadStateFromLocalStorage();
+    const state = stored || {};
+    const currentSettings: Settings | undefined = state.settings;
+    
+    const defaultFontFamily = language === "zh" ? DEFAULT_FONT_FAMILY_ZH : DEFAULT_FONT_FAMILY;
+    const defaultFormToHeading = language === "zh"
+      ? { ...CHINESE_FORM_HEADINGS }
+      : { ...ENGLISH_FORM_HEADINGS };
+
+    const newSettings: Settings = {
+      ...currentSettings,
+      language,
+      fontFamily: currentSettings?.fontFamily && currentSettings.fontFamily !== DEFAULT_FONT_FAMILY && currentSettings.fontFamily !== DEFAULT_FONT_FAMILY_ZH
+        ? currentSettings.fontFamily
+        : defaultFontFamily,
+      formToHeading: {
+        ...currentSettings?.formToHeading,
+        ...defaultFormToHeading,
+      },
+    } as Settings;
+
+    const newState = {
+      ...state,
+      settings: newSettings,
+    };
+
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(newState));
   } catch (e) {
     // Ignore
   }
@@ -61,30 +82,19 @@ export const useTranslation = (): {
   }, []);
 
   const setLanguage = useCallback((newLanguage: Language) => {
+    if (newLanguage === language) return;
+    
     setLanguageState(newLanguage);
-    setStoredLanguage(newLanguage);
-  }, []);
+    updateStoredLanguage(newLanguage);
+    
+    try {
+      store.dispatch(changeLanguage(newLanguage));
+    } catch (e) {
+      // Ignore if Redux is not initialized (e.g., on static pages)
+    }
+  }, [language]);
 
   const t = isInitialized ? TRANSLATIONS[language] : TRANSLATIONS[DEFAULT_LANGUAGE];
 
   return { t, language, setLanguage };
-};
-
-export const useTranslationWithRedux = (): {
-  t: Translation;
-  language: Language;
-} => {
-  const language = useAppSelector(selectLanguage);
-  const dispatch = useAppDispatch();
-
-  const setLanguage = useCallback(
-    (newLanguage: Language) => {
-      dispatch(changeLanguage(newLanguage));
-    },
-    [dispatch]
-  );
-
-  const t = TRANSLATIONS[language];
-
-  return { t, language };
 };

@@ -1,3 +1,4 @@
+"use client";
 import { Form, FormSection } from "components/ResumeForm/Form";
 import {
   BulletListTextarea,
@@ -12,6 +13,7 @@ import {
   changeShowBulletPoints,
   selectShowBulletPoints,
 } from "lib/redux/settingsSlice";
+import { useTranslation } from "lib/i18n";
 
 export const EducationsForm = () => {
   const educations = useAppSelector(selectEducations);
@@ -19,9 +21,10 @@ export const EducationsForm = () => {
   const showDelete = educations.length > 1;
   const form = "educations";
   const showBulletPoints = useAppSelector(selectShowBulletPoints(form));
+  const { t } = useTranslation();
 
   return (
-    <Form form={form} addButtonText="Add School">
+    <Form form={form} addButtonText={t.resumeForm.education.addButton}>
       {educations.map(({ school, degree, gpa, date, descriptions }, idx) => {
         const handleEducationChange = (
           ...[
@@ -47,46 +50,46 @@ export const EducationsForm = () => {
             showMoveUp={showMoveUp}
             showMoveDown={showMoveDown}
             showDelete={showDelete}
-            deleteButtonTooltipText="Delete school"
+            deleteButtonTooltipText={t.resumeForm.education.deleteTooltip}
           >
             <Input
-              label="School"
+              label={t.resumeForm.education.school}
               labelClassName="col-span-4"
               name="school"
-              placeholder="Cornell University"
+              placeholder={t.resumeForm.education.schoolPlaceholder}
               value={school}
               onChange={handleEducationChange}
             />
             <Input
-              label="Date"
+              label={t.resumeForm.education.date}
               labelClassName="col-span-2"
               name="date"
-              placeholder="May 2018"
+              placeholder={t.resumeForm.education.datePlaceholder}
               value={date}
               onChange={handleEducationChange}
             />
             <Input
-              label="Degree & Major"
+              label={t.resumeForm.education.degree}
               labelClassName="col-span-4"
               name="degree"
-              placeholder="Bachelor of Science in Computer Engineering"
+              placeholder={t.resumeForm.education.degreePlaceholder}
               value={degree}
               onChange={handleEducationChange}
             />
             <Input
-              label="GPA"
+              label={t.resumeForm.education.gpa}
               labelClassName="col-span-2"
               name="gpa"
-              placeholder="3.81"
+              placeholder={t.resumeForm.education.gpaPlaceholder}
               value={gpa}
               onChange={handleEducationChange}
             />
             <div className="relative col-span-full">
               <BulletListTextarea
-                label="Additional Information (Optional)"
+                label={t.resumeForm.education.additionalInfo}
                 labelClassName="col-span-full"
                 name="descriptions"
-                placeholder="Free paragraph space to list out additional activities, courses, awards etc"
+                placeholder={t.resumeForm.education.additionalInfoPlaceholder}
                 value={descriptions}
                 onChange={handleEducationChange}
                 showBulletPoints={showBulletPoints}

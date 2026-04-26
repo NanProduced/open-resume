@@ -1,3 +1,4 @@
+"use client";
 import { Form, FormSection } from "components/ResumeForm/Form";
 import {
   Input,
@@ -10,15 +11,17 @@ import {
   selectWorkExperiences,
 } from "lib/redux/resumeSlice";
 import type { ResumeWorkExperience } from "lib/redux/types";
+import { useTranslation } from "lib/i18n";
 
 export const WorkExperiencesForm = () => {
   const workExperiences = useAppSelector(selectWorkExperiences);
   const dispatch = useAppDispatch();
+  const { t } = useTranslation();
 
   const showDelete = workExperiences.length > 1;
 
   return (
-    <Form form="workExperiences" addButtonText="Add Job">
+    <Form form="workExperiences" addButtonText={t.resumeForm.work.addButton}>
       {workExperiences.map(({ company, jobTitle, date, descriptions }, idx) => {
         const handleWorkExperienceChange = (
           ...[
@@ -26,9 +29,6 @@ export const WorkExperiencesForm = () => {
             value,
           ]: CreateHandleChangeArgsWithDescriptions<ResumeWorkExperience>
         ) => {
-          // TS doesn't support passing union type to single call signature
-          // https://github.com/microsoft/TypeScript/issues/54027
-          // any is used here as a workaround
           dispatch(changeWorkExperiences({ idx, field, value } as any));
         };
         const showMoveUp = idx !== 0;
@@ -42,37 +42,37 @@ export const WorkExperiencesForm = () => {
             showMoveUp={showMoveUp}
             showMoveDown={showMoveDown}
             showDelete={showDelete}
-            deleteButtonTooltipText="Delete job"
+            deleteButtonTooltipText={t.resumeForm.work.deleteTooltip}
           >
             <Input
-              label="Company"
+              label={t.resumeForm.work.company}
               labelClassName="col-span-full"
               name="company"
-              placeholder="Khan Academy"
+              placeholder={t.resumeForm.work.companyPlaceholder}
               value={company}
               onChange={handleWorkExperienceChange}
             />
             <Input
-              label="Job Title"
+              label={t.resumeForm.work.jobTitle}
               labelClassName="col-span-4"
               name="jobTitle"
-              placeholder="Software Engineer"
+              placeholder={t.resumeForm.work.jobTitlePlaceholder}
               value={jobTitle}
               onChange={handleWorkExperienceChange}
             />
             <Input
-              label="Date"
+              label={t.resumeForm.work.date}
               labelClassName="col-span-2"
               name="date"
-              placeholder="Jun 2022 - Present"
+              placeholder={t.resumeForm.work.datePlaceholder}
               value={date}
               onChange={handleWorkExperienceChange}
             />
             <BulletListTextarea
-              label="Description"
+              label={t.resumeForm.work.description}
               labelClassName="col-span-full"
               name="descriptions"
-              placeholder="Bullet points"
+              placeholder={t.resumeForm.work.descriptionPlaceholder}
               value={descriptions}
               onChange={handleWorkExperienceChange}
             />
