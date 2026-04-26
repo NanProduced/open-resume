@@ -62,7 +62,7 @@ export const ENGLISH_FORM_HEADINGS: Settings["formToHeading"] = {
   custom: "CUSTOM SECTION",
 };
 
-const createInitialSettings = (language: Language = DEFAULT_LANGUAGE): Settings => ({
+export const createInitialSettings = (language: Language = DEFAULT_LANGUAGE): Settings => ({
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: language === "zh" ? DEFAULT_FONT_FAMILY_ZH : DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,

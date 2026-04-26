@@ -1,13 +1,18 @@
-const STEPS = [
-  { title: "Add a resume pdf", text: "or create from scratch" },
-  { title: "Preview design", text: "and make edits" },
-  { title: "Download new resume", text: "and apply with confidence" },
-];
+"use client";
+import { useTranslation } from "lib/i18n";
 
 export const Steps = () => {
+  const { t } = useTranslation();
+
+  const STEPS = [
+    { title: t.steps.step1Title, text: t.steps.step1Text },
+    { title: t.steps.step2Title, text: t.steps.step2Text },
+    { title: t.steps.step3Title, text: t.steps.step3Text },
+  ];
+
   return (
     <section className="mx-auto mt-8 rounded-2xl bg-sky-50 bg-dot px-8 pb-12 pt-10 lg:mt-2">
-      <h1 className="text-center text-3xl font-bold">3 Simple Steps</h1>
+      <h1 className="text-center text-3xl font-bold">{t.steps.title}</h1>
       <div className="mt-8 flex justify-center">
         <dl className="flex flex-col gap-y-10 lg:flex-row lg:justify-center lg:gap-x-20">
           {STEPS.map(({ title, text }, idx) => (
