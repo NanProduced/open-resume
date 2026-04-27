@@ -3,11 +3,12 @@ import {
   initialProfile,
   initialProject,
   initialWorkExperience,
+  migrateResumeWithIds,
 } from "lib/redux/resumeSlice";
 import type { Resume } from "lib/redux/types";
 import { deepClone } from "lib/deep-clone";
 
-export const END_HOME_RESUME: Resume = {
+const rawEndHomeResume = {
   profile: {
     name: "John Doe",
     summary:
@@ -89,15 +90,17 @@ export const END_HOME_RESUME: Resume = {
   },
 };
 
-export const START_HOME_RESUME: Resume = {
+export const END_HOME_RESUME: Resume = migrateResumeWithIds(rawEndHomeResume);
+
+const rawStartHomeResume = {
   profile: deepClone(initialProfile),
-  workExperiences: END_HOME_RESUME.workExperiences.map(() =>
+  workExperiences: rawEndHomeResume.workExperiences.map(() =>
     deepClone(initialWorkExperience)
   ),
   educations: [deepClone(initialEducation)],
   projects: [deepClone(initialProject)],
   skills: {
-    featuredSkills: END_HOME_RESUME.skills.featuredSkills.map((item) => ({
+    featuredSkills: rawEndHomeResume.skills.featuredSkills.map((item) => ({
       skill: "",
       rating: item.rating,
     })),
@@ -107,3 +110,5 @@ export const START_HOME_RESUME: Resume = {
     descriptions: [],
   },
 };
+
+export const START_HOME_RESUME: Resume = migrateResumeWithIds(rawStartHomeResume);

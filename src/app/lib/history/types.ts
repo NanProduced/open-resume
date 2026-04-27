@@ -1,4 +1,5 @@
-import type { Resume, Settings } from "lib/redux/types";
+import type { Resume } from "lib/redux/types";
+import type { Settings } from "lib/redux/settingsSlice";
 
 export type ResumeId = string;
 

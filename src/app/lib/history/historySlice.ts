@@ -19,7 +19,8 @@ import {
   cleanupOldSnapshots,
 } from "lib/history/indexedDB";
 import { diffResume, hasAnyChanges } from "lib/history/diff";
-import type { Resume, Settings } from "lib/redux/types";
+import type { Resume } from "lib/redux/types";
+import type { Settings } from "lib/redux/settingsSlice";
 
 interface HistoryState {
   snapshots: Snapshot[];

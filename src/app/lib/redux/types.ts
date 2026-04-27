@@ -10,7 +10,7 @@ export interface ResumeProfile {
 }
 
 export interface ResumeWorkExperience {
-  id: ItemId;
+  id?: ItemId;
   company: string;
   jobTitle: string;
   date: string;
@@ -18,7 +18,7 @@ export interface ResumeWorkExperience {
 }
 
 export interface ResumeEducation {
-  id: ItemId;
+  id?: ItemId;
   school: string;
   degree: string;
   date: string;
@@ -27,14 +27,14 @@ export interface ResumeEducation {
 }
 
 export interface ResumeProject {
-  id: ItemId;
+  id?: ItemId;
   project: string;
   date: string;
   descriptions: string[];
 }
 
 export interface FeaturedSkill {
-  id: ItemId;
+  id?: ItemId;
   skill: string;
   rating: number;
 }

@@ -278,21 +278,21 @@ export const migrateResumeWithIds = (
   const migrated: Resume = {
     ...resume,
     profile: { ...resume.profile },
-    workExperiences: resume.workExperiences.map((item, index) => ({
+    workExperiences: resume.workExperiences.map((item) => ({
       ...item,
       id: item.id || generateItemId(),
     })),
-    educations: resume.educations.map((item, index) => ({
+    educations: resume.educations.map((item) => ({
       ...item,
       id: item.id || generateItemId(),
     })),
-    projects: resume.projects.map((item, index) => ({
+    projects: resume.projects.map((item) => ({
       ...item,
       id: item.id || generateItemId(),
     })),
     skills: {
       ...resume.skills,
-      featuredSkills: resume.skills.featuredSkills.map((item, index) => ({
+      featuredSkills: resume.skills.featuredSkills.map((item) => ({
         ...item,
         id: item.id || generateItemId(),
       })),
