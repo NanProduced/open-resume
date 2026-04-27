@@ -1,5 +1,5 @@
 "use client";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import { ResumeIframeCSR } from "components/Resume/ResumeIFrame";
 import { ResumePDF } from "components/Resume/ResumePDF";
 import {
@@ -7,9 +7,9 @@ import {
   ResumeControlBarBorder,
 } from "components/Resume/ResumeControlBar";
 import { FlexboxSpacer } from "components/FlexboxSpacer";
-import { useAppSelector } from "lib/redux/hooks";
+import { useAppSelector, useAppDispatch } from "lib/redux/hooks";
 import { selectResume } from "lib/redux/resumeSlice";
-import { selectSettings, selectFineTuneMode } from "lib/redux/settingsSlice";
+import { selectSettings, selectFineTuneMode, selectSelectedSection, setSelectedSection } from "lib/redux/settingsSlice";
 import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
 import {
   useRegisterReactPDFFont,
@@ -17,12 +17,19 @@ import {
 } from "components/fonts/hooks";
 import { NonEnglishFontsCSSLazyLoader } from "components/fonts/NonEnglishFontsCSSLoader";
 import { LayoutOverridePanel } from "components/Resume/LayoutOverridePanel";
+import type { ShowForm } from "lib/redux/settingsSlice";
 
 export const Resume = () => {
   const [scale, setScale] = useState(0.8);
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
   const fineTuneMode = useAppSelector(selectFineTuneMode);
+  const selectedSection = useAppSelector(selectSelectedSection);
+  const dispatch = useAppDispatch();
+
+  const handleSectionSelect = useCallback((section: ShowForm) => {
+    dispatch(setSelectedSection(section));
+  }, [dispatch]);
 
   const document = useMemo(
     () => <ResumePDF resume={resume} settings={settings} isPDF={true} />,
@@ -48,6 +55,9 @@ export const Resume = () => {
                 resume={resume}
                 settings={settings}
                 isPDF={DEBUG_RESUME_PDF_FLAG}
+                fineTuneMode={fineTuneMode}
+                onSectionSelect={handleSectionSelect}
+                selectedSection={selectedSection}
               />
             </ResumeIframeCSR>
           </section>
