@@ -6,13 +6,16 @@ import type {
   ResumeProject,
   ResumeSkills,
   ResumeCustom,
+  ItemId,
+} from "lib/redux/types";
+import type {
   TextDiff,
   ArrayItemDiff,
   SectionDiff,
   ResumeDiff,
   DiffType,
 } from "lib/history/types";
-import type { ItemId } from "lib/redux/types";
+import { migrateResumeWithIds } from "lib/redux/resumeSlice";
 
 const generateContentHashId = (obj: any, index: number): string => {
   const str = JSON.stringify(obj);
@@ -122,7 +125,8 @@ export const diffTextFields = (
   newObj: Record<string, any>
 ): Record<string, TextDiff[]> => {
   const result: Record<string, TextDiff[]> = {};
-  const allKeys = new Set([...Object.keys(oldObj || {}), ...Object.keys(newObj || {})]);
+  const merged = { ...(oldObj || {}), ...(newObj || {}) };
+  const allKeys = Object.keys(merged);
 
   for (const key of allKeys) {
     const oldVal = oldObj?.[key];
@@ -161,15 +165,28 @@ export const diffArrayItems = <T extends Record<string, any>>(
     index: idx,
   }));
 
-  const oldItemMap = new Map(oldItems.map((o) => [o.id, o]));
-  const newItemMap = new Map(newItems.map((n) => [n.id, n]));
+  const oldItemMap: Record<string, any> = {};
+  const newItemMap: Record<string, any> = {};
+  const allIds: string[] = [];
+
+  for (const item of oldItems) {
+    oldItemMap[item.id] = item;
+    if (!allIds.includes(item.id)) {
+      allIds.push(item.id);
+    }
+  }
+  for (const item of newItems) {
+    newItemMap[item.id] = item;
+    if (!allIds.includes(item.id)) {
+      allIds.push(item.id);
+    }
+  }
 
   const result: ArrayItemDiff<T>[] = [];
-  const allIds = new Set([...oldItemMap.keys(), ...newItemMap.keys()]);
 
   for (const id of allIds) {
-    const oldItem = oldItemMap.get(id);
-    const newItem = newItemMap.get(id);
+    const oldItem = oldItemMap[id];
+    const newItem = newItemMap[id];
 
     if (oldItem && !newItem) {
       result.push({
@@ -285,9 +302,12 @@ export const diffSkills = (
 };
 
 export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] => {
+  const migratedOldResume = migrateResumeWithIds(oldResume);
+  const migratedNewResume = migrateResumeWithIds(newResume);
+
   const sections: SectionDiff[] = [];
 
-  const profileDiff = diffProfile(oldResume.profile, newResume.profile);
+  const profileDiff = diffProfile(migratedOldResume.profile, migratedNewResume.profile);
   if (profileDiff.length > 0) {
     sections.push({
       section: "profile",
@@ -297,8 +317,8 @@ export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] 
   }
 
   const workExpDiffs = diffArrayItems(
-    oldResume.workExperiences,
-    newResume.workExperiences
+    migratedOldResume.workExperiences,
+    migratedNewResume.workExperiences
   );
   if (workExpDiffs.some((d) => d.type !== "unchanged")) {
     sections.push({
@@ -308,7 +328,7 @@ export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] 
     });
   }
 
-  const educationDiffs = diffArrayItems(oldResume.educations, newResume.educations);
+  const educationDiffs = diffArrayItems(migratedOldResume.educations, migratedNewResume.educations);
   if (educationDiffs.some((d) => d.type !== "unchanged")) {
     sections.push({
       section: "educations",
@@ -317,7 +337,7 @@ export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] 
     });
   }
 
-  const projectDiffs = diffArrayItems(oldResume.projects, newResume.projects);
+  const projectDiffs = diffArrayItems(migratedOldResume.projects, migratedNewResume.projects);
   if (projectDiffs.some((d) => d.type !== "unchanged")) {
     sections.push({
       section: "projects",
@@ -326,7 +346,7 @@ export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] 
     });
   }
 
-  const skillsDiffs = diffSkills(oldResume.skills, newResume.skills);
+  const skillsDiffs = diffSkills(migratedOldResume.skills, migratedNewResume.skills);
   if (skillsDiffs.some((d) => d.type !== "unchanged")) {
     sections.push({
       section: "skills",
@@ -336,8 +356,8 @@ export const diffResume = (oldResume: Resume, newResume: Resume): SectionDiff[] 
   }
 
   const customDiffs = diffArrayItems(
-    (oldResume.custom?.descriptions || []).map((d) => ({ text: d })),
-    (newResume.custom?.descriptions || []).map((d) => ({ text: d }))
+    (migratedOldResume.custom?.descriptions || []).map((d) => ({ text: d })),
+    (migratedNewResume.custom?.descriptions || []).map((d) => ({ text: d }))
   );
   if (customDiffs.some((d) => d.type !== "unchanged")) {
     sections.push({

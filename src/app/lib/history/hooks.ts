@@ -1,7 +1,8 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { store, type RootState, type AppDispatch } from "lib/redux/store";
-import type { Resume, Settings } from "lib/redux/types";
+import type { Resume } from "lib/redux/types";
+import type { Settings } from "lib/redux/settingsSlice";
 import {
   createSnapshot,
   createSnapshotBeforeRestore,

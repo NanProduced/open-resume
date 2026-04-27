@@ -7,6 +7,8 @@ import {
   saveStateToLocalStorage,
 } from "lib/redux/local-storage";
 import { type ShowForm, initialSettings } from "lib/redux/settingsSlice";
+import { migrateResumeWithIds } from "lib/redux/resumeSlice";
+import { DEFAULT_HISTORY_CONFIG } from "lib/history/types";
 import { useRouter } from "next/navigation";
 import addPdfSrc from "public/assets/add-pdf.svg";
 import Image from "next/image";
@@ -72,10 +74,10 @@ export const ResumeDropzone = ({
   };
 
   const onImportClick = async () => {
-    const resume = await parseResumeFromPdf(file.fileUrl);
+    const rawResume = await parseResumeFromPdf(file.fileUrl);
+    const resume = migrateResumeWithIds(rawResume);
     const settings = deepClone(initialSettings);
 
-    // Set formToShow settings based on uploaded resume if users have used the app before
     if (getHasUsedAppBefore()) {
       const sections = Object.keys(settings.formToShow) as ShowForm[];
       const sectionToFormToShow: Record<ShowForm, boolean> = {
@@ -90,7 +92,18 @@ export const ResumeDropzone = ({
       }
     }
 
-    saveStateToLocalStorage({ resume, settings });
+    const initialHistory = {
+      snapshots: [],
+      currentSnapshotId: null,
+      selectedSnapshotIds: [null, null] as [string | null, string | null],
+      diff: null,
+      config: DEFAULT_HISTORY_CONFIG,
+      loading: false,
+      error: null,
+      isSaving: false,
+    };
+
+    saveStateToLocalStorage({ resume, settings, history: initialHistory });
     router.push("/resume-builder");
   };
 
