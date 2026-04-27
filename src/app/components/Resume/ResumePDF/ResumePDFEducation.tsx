@@ -6,23 +6,29 @@ import {
 } from "components/Resume/ResumePDF/common";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeEducation } from "lib/redux/types";
+import type { SectionLayoutOverride } from "lib/redux/settingsSlice";
 
 export const ResumePDFEducation = ({
   heading,
   educations,
   themeColor,
   showBulletPoints,
+  layoutOverride,
 }: {
   heading: string;
   educations: ResumeEducation[];
   themeColor: string;
   showBulletPoints: boolean;
+  layoutOverride?: SectionLayoutOverride;
 }) => {
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layoutOverride={layoutOverride}
+    >
       {educations.map(
         ({ school, degree, date, gpa, descriptions = [] }, idx) => {
-          // Hide school name if it is the same as the previous school
           const hideSchoolName =
             idx > 0 && school === educations[idx - 1].school;
           const showDescriptions = descriptions.join() !== "";
@@ -30,7 +36,9 @@ export const ResumePDFEducation = ({
           return (
             <View key={idx}>
               {!hideSchoolName && (
-                <ResumePDFText bold={true}>{school}</ResumePDFText>
+                <ResumePDFText bold={true} layoutOverride={layoutOverride}>
+                  {school}
+                </ResumePDFText>
               )}
               <View
                 style={{
@@ -40,18 +48,19 @@ export const ResumePDFEducation = ({
                     : spacing["1.5"],
                 }}
               >
-                <ResumePDFText>{`${
+                <ResumePDFText layoutOverride={layoutOverride}>{`${
                   gpa
                     ? `${degree} - ${Number(gpa) ? gpa + " GPA" : gpa}`
                     : degree
                 }`}</ResumePDFText>
-                <ResumePDFText>{date}</ResumePDFText>
+                <ResumePDFText layoutOverride={layoutOverride}>{date}</ResumePDFText>
               </View>
               {showDescriptions && (
                 <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
                   <ResumePDFBulletList
                     items={descriptions}
                     showBulletPoints={showBulletPoints}
+                    layoutOverride={layoutOverride}
                   />
                 </View>
               )}

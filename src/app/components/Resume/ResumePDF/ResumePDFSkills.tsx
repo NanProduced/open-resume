@@ -6,17 +6,20 @@ import {
 } from "components/Resume/ResumePDF/common";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeSkills } from "lib/redux/types";
+import type { SectionLayoutOverride } from "lib/redux/settingsSlice";
 
 export const ResumePDFSkills = ({
   heading,
   skills,
   themeColor,
   showBulletPoints,
+  layoutOverride,
 }: {
   heading: string;
   skills: ResumeSkills;
   themeColor: string;
   showBulletPoints: boolean;
+  layoutOverride?: SectionLayoutOverride;
 }) => {
   const { descriptions, featuredSkills } = skills;
   const featuredSkillsWithText = featuredSkills.filter((item) => item.skill);
@@ -27,7 +30,11 @@ export const ResumePDFSkills = ({
   ];
 
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layoutOverride={layoutOverride}
+    >
       {featuredSkillsWithText.length > 0 && (
         <View style={{ ...styles.flexRowBetween, marginTop: spacing["0.5"] }}>
           {featuredSkillsPair.map((pair, idx) => (
@@ -48,6 +55,7 @@ export const ResumePDFSkills = ({
                     style={{
                       justifyContent: "flex-end",
                     }}
+                    layoutOverride={layoutOverride}
                   />
                 );
               })}
@@ -59,6 +67,7 @@ export const ResumePDFSkills = ({
         <ResumePDFBulletList
           items={descriptions}
           showBulletPoints={showBulletPoints}
+          layoutOverride={layoutOverride}
         />
       </View>
     </ResumePDFSection>
