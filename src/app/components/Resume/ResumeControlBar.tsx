@@ -4,9 +4,18 @@ import { useSetDefaultScale } from "components/Resume/hooks";
 import {
   MagnifyingGlassIcon,
   ArrowDownTrayIcon,
+  ArrowsPointingOutIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { usePDF } from "@react-pdf/renderer";
 import dynamic from "next/dynamic";
+import { useAppSelector, useAppDispatch } from "lib/redux/hooks";
+import {
+  selectLayoutOverrides,
+  resetLayoutOverrides,
+  selectFineTuneMode,
+  toggleFineTuneMode,
+} from "lib/redux/settingsSlice";
 
 const ResumeControlBar = ({
   scale,
@@ -26,9 +35,14 @@ const ResumeControlBar = ({
     documentSize,
   });
 
+  const dispatch = useAppDispatch();
+  const fineTuneMode = useAppSelector(selectFineTuneMode);
+  const layoutOverrides = useAppSelector(selectLayoutOverrides);
+
   const [instance, update] = usePDF({ document });
 
-  // Hook to update pdf when document changes
+  const hasOverrides = Object.keys(layoutOverrides).length > 0;
+
   useEffect(() => {
     update();
   }, [update, document]);
@@ -59,21 +73,45 @@ const ResumeControlBar = ({
           <span className="select-none">Autoscale</span>
         </label>
       </div>
-      <a
-        className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100 lg:ml-8"
-        href={instance.url!}
-        download={fileName}
-      >
-        <ArrowDownTrayIcon className="h-4 w-4" />
-        <span className="whitespace-nowrap">Download Resume</span>
-      </a>
+      <div className="flex items-center gap-2">
+        {hasOverrides && (
+          <button
+            type="button"
+            onClick={() => dispatch(resetLayoutOverrides())}
+            className="flex items-center gap-1 rounded-md border border-orange-300 bg-orange-50 px-3 py-0.5 text-xs font-medium text-orange-700 hover:bg-orange-100"
+            title="Reset all layout overrides"
+          >
+            <ArrowPathIcon className="h-4 w-4" />
+            <span className="hidden sm:inline">Reset Layout</span>
+          </button>
+        )}
+        <button
+          type="button"
+          onClick={() => dispatch(toggleFineTuneMode())}
+          className={`flex items-center gap-1 rounded-md border px-3 py-0.5 text-xs font-medium transition-colors ${
+            fineTuneMode
+              ? "border-sky-500 bg-sky-500 text-white hover:bg-sky-600"
+              : "border-gray-300 bg-white text-gray-700 hover:bg-gray-100"
+          }`}
+          title="Toggle layout fine-tune mode"
+        >
+          <ArrowsPointingOutIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">{fineTuneMode ? "Editing" : "Fine-Tune"}</span>
+        </button>
+        <a
+          className="ml-1 flex items-center gap-1 rounded-md border border-gray-300 px-3 py-0.5 hover:bg-gray-100 lg:ml-0"
+          href={instance.url!}
+          download={fileName}
+        >
+          <ArrowDownTrayIcon className="h-4 w-4" />
+          <span className="whitespace-nowrap hidden sm:inline">Download Resume</span>
+          <span className="whitespace-nowrap sm:hidden">Download</span>
+        </a>
+      </div>
     </div>
   );
 };
 
-/**
- * Load ResumeControlBar client side since it uses usePDF, which is a web specific API
- */
 export const ResumeControlBarCSR = dynamic(
   () => Promise.resolve(ResumeControlBar),
   {

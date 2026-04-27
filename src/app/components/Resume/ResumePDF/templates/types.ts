@@ -1,5 +1,5 @@
 import type { Resume } from "lib/redux/types";
-import type { Settings, ShowForm } from "lib/redux/settingsSlice";
+import type { Settings, ShowForm, SectionLayoutOverride } from "lib/redux/settingsSlice";
 
 export type TemplateType = "default" | "modern" | "compact";
 
@@ -10,6 +10,9 @@ export interface TemplateProps {
   isPDF: boolean;
   formTypeToComponent: { [type in ShowForm]: () => JSX.Element };
   showFormsOrder: ShowForm[];
+  fineTuneMode?: boolean;
+  onSectionSelect?: (section: ShowForm) => void;
+  selectedSection?: ShowForm | null;
 }
 
 export interface Template {
