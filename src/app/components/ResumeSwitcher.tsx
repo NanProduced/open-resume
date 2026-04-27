@@ -11,8 +11,8 @@ import {
   deleteResume,
   renameResume,
 } from "lib/redux/resumeStoreSlice";
-import { setResume } from "lib/redux/resumeSlice";
-import { setSettings } from "lib/redux/settingsSlice";
+import { setResume, initialResumeState } from "lib/redux/resumeSlice";
+import { setSettings, initialSettings } from "lib/redux/settingsSlice";
 import {
   ChevronDownIcon,
   PlusIcon,
@@ -66,23 +66,34 @@ export const ResumeSwitcher = () => {
 
   const handleCreateResume = () => {
     dispatch(createResume({ name: "新简历" }));
+    dispatch(setResume(initialResumeState));
+    dispatch(setSettings(initialSettings));
     setIsDropdownOpen(false);
   };
 
   const handleDuplicateResume = (resumeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    dispatch(duplicateResume({ resumeId }));
+    const resumeToDuplicate = resumes.find((r) => r.id === resumeId);
+    if (resumeToDuplicate) {
+      dispatch(duplicateResume({ resumeId }));
+      dispatch(setResume(resumeToDuplicate.resume));
+      dispatch(setSettings(resumeToDuplicate.settings));
+    }
   };
 
   const handleDeleteResume = (resumeId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     if (resumes.length > 1) {
-      const remainingResumes = resumes.filter((r) => r.id !== resumeId);
-      const nextResume = remainingResumes[0];
+      const isDeletingCurrentResume = resumeId === currentResumeId;
       dispatch(deleteResume({ resumeId }));
-      if (nextResume) {
-        dispatch(setResume(nextResume.resume));
-        dispatch(setSettings(nextResume.settings));
+      
+      if (isDeletingCurrentResume) {
+        const remainingResumes = resumes.filter((r) => r.id !== resumeId);
+        const nextResume = remainingResumes[0];
+        if (nextResume) {
+          dispatch(setResume(nextResume.resume));
+          dispatch(setSettings(nextResume.settings));
+        }
       }
     }
   };
