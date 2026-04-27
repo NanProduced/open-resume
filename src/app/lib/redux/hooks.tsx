@@ -60,7 +60,7 @@ export const useSetInitialStore = () => {
   const dispatch = useAppDispatch();
   useEffect(() => {
     const state = loadStateFromLocalStorage();
-    if (!state) {
+    if (!state || !state.resumeStore || state.resumeStore.resumes.length === 0) {
       dispatch(
         createResume({
           name: "我的简历",
@@ -68,25 +68,30 @@ export const useSetInitialStore = () => {
           settings: initialSettings,
         })
       );
+      dispatch(setResume(initialResumeState));
+      dispatch(setSettings(initialSettings));
       return;
     }
 
-    if (state.resumeStore) {
-      const mergedResumes = state.resumeStore.resumes.map(mergeResumeEntry);
-      dispatch(
-        setResumeStore({
-          currentResumeId: state.resumeStore.currentResumeId,
-          resumes: mergedResumes,
-        })
-      );
+    const mergedResumes = state.resumeStore.resumes.map(mergeResumeEntry);
+    let currentResumeId = state.resumeStore.currentResumeId;
+    
+    let currentResume = mergedResumes.find((r) => r.id === currentResumeId);
+    if (!currentResume && mergedResumes.length > 0) {
+      currentResume = mergedResumes[0];
+      currentResumeId = currentResume.id;
+    }
 
-      const currentResume = mergedResumes.find(
-        (r) => r.id === state.resumeStore.currentResumeId
-      );
-      if (currentResume) {
-        dispatch(setResume(currentResume.resume));
-        dispatch(setSettings(currentResume.settings));
-      }
+    dispatch(
+      setResumeStore({
+        currentResumeId,
+        resumes: mergedResumes,
+      })
+    );
+
+    if (currentResume) {
+      dispatch(setResume(currentResume.resume));
+      dispatch(setSettings(currentResume.settings));
     }
   }, []);
 };
