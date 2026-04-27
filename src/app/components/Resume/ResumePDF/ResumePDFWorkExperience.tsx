@@ -6,27 +6,35 @@ import {
 } from "components/Resume/ResumePDF/common";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import type { ResumeWorkExperience } from "lib/redux/types";
+import type { SectionLayoutOverride } from "lib/redux/settingsSlice";
 
 export const ResumePDFWorkExperience = ({
   heading,
   workExperiences,
   themeColor,
+  layoutOverride,
 }: {
   heading: string;
   workExperiences: ResumeWorkExperience[];
   themeColor: string;
+  layoutOverride?: SectionLayoutOverride;
 }) => {
   return (
-    <ResumePDFSection themeColor={themeColor} heading={heading}>
+    <ResumePDFSection
+      themeColor={themeColor}
+      heading={heading}
+      layoutOverride={layoutOverride}
+    >
       {workExperiences.map(({ company, jobTitle, date, descriptions }, idx) => {
-        // Hide company name if it is the same as the previous company
         const hideCompanyName =
           idx > 0 && company === workExperiences[idx - 1].company;
 
         return (
           <View key={idx} style={idx !== 0 ? { marginTop: spacing["2"] } : {}}>
             {!hideCompanyName && (
-              <ResumePDFText bold={true}>{company}</ResumePDFText>
+              <ResumePDFText bold={true} layoutOverride={layoutOverride}>
+                {company}
+              </ResumePDFText>
             )}
             <View
               style={{
@@ -36,11 +44,11 @@ export const ResumePDFWorkExperience = ({
                   : spacing["1.5"],
               }}
             >
-              <ResumePDFText>{jobTitle}</ResumePDFText>
-              <ResumePDFText>{date}</ResumePDFText>
+              <ResumePDFText layoutOverride={layoutOverride}>{jobTitle}</ResumePDFText>
+              <ResumePDFText layoutOverride={layoutOverride}>{date}</ResumePDFText>
             </View>
             <View style={{ ...styles.flexCol, marginTop: spacing["1.5"] }}>
-              <ResumePDFBulletList items={descriptions} />
+              <ResumePDFBulletList items={descriptions} layoutOverride={layoutOverride} />
             </View>
           </View>
         );

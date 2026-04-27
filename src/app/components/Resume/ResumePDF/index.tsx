@@ -51,6 +51,7 @@ export const ResumePDF = ({
     formsOrder,
     showBulletPoints,
     template,
+    layoutOverrides,
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
 
@@ -62,6 +63,7 @@ export const ResumePDF = ({
         heading={formToHeading["workExperiences"]}
         workExperiences={workExperiences}
         themeColor={themeColor}
+        layoutOverride={layoutOverrides["workExperiences"]}
       />
     ),
     educations: () => (
@@ -70,6 +72,7 @@ export const ResumePDF = ({
         educations={educations}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["educations"]}
+        layoutOverride={layoutOverrides["educations"]}
       />
     ),
     projects: () => (
@@ -77,6 +80,7 @@ export const ResumePDF = ({
         heading={formToHeading["projects"]}
         projects={projects}
         themeColor={themeColor}
+        layoutOverride={layoutOverrides["projects"]}
       />
     ),
     skills: () => (
@@ -85,6 +89,7 @@ export const ResumePDF = ({
         skills={skills}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["skills"]}
+        layoutOverride={layoutOverrides["skills"]}
       />
     ),
     custom: () => (
@@ -93,6 +98,7 @@ export const ResumePDF = ({
         custom={custom}
         themeColor={themeColor}
         showBulletPoints={showBulletPoints["custom"]}
+        layoutOverride={layoutOverrides["custom"]}
       />
     ),
   };

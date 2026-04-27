@@ -3,10 +3,20 @@ import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import { ResumePDFProfile } from "components/Resume/ResumePDF/ResumePDFProfile";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 import type { TemplateProps } from "./types";
-import type { ShowForm } from "lib/redux/settingsSlice";
+import type { ShowForm, ColumnType } from "lib/redux/settingsSlice";
 
-const SIDEBAR_FORM_TYPES: ShowForm[] = ["skills"];
-const MAIN_CONTENT_FORM_TYPES: ShowForm[] = ["workExperiences", "educations", "projects", "custom"];
+const DEFAULT_SIDEBAR_FORM: ShowForm = "skills";
+
+const getFormColumn = (
+  form: ShowForm,
+  layoutOverrides: { [section: string]: { column?: ColumnType } }
+): ColumnType => {
+  const column = layoutOverrides[form]?.column;
+  if (column) {
+    return column;
+  }
+  return form === DEFAULT_SIDEBAR_FORM ? "sidebar" : "main";
+};
 
 export const TemplateModern = ({
   resume,
@@ -17,13 +27,13 @@ export const TemplateModern = ({
   showFormsOrder,
 }: TemplateProps) => {
   const { profile } = resume;
-  const { fontFamily, fontSize, documentSize, formToShow } = settings;
+  const { fontFamily, fontSize, documentSize, formToShow, layoutOverrides } = settings;
 
   const sidebarFormsOrder = showFormsOrder.filter((form) => 
-    SIDEBAR_FORM_TYPES.includes(form) && formToShow[form]
+    formToShow[form] && getFormColumn(form, layoutOverrides) === "sidebar"
   );
   const mainContentFormsOrder = showFormsOrder.filter((form) => 
-    MAIN_CONTENT_FORM_TYPES.includes(form) && formToShow[form]
+    formToShow[form] && getFormColumn(form, layoutOverrides) === "main"
   );
 
   const sidebarVisible = sidebarFormsOrder.length > 0;
