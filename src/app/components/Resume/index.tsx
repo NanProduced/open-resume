@@ -9,18 +9,21 @@ import {
 import { FlexboxSpacer } from "components/FlexboxSpacer";
 import { useAppSelector } from "lib/redux/hooks";
 import { selectResume } from "lib/redux/resumeSlice";
-import { selectSettings } from "lib/redux/settingsSlice";
+import { selectSettings, selectFineTuneMode } from "lib/redux/settingsSlice";
 import { DEBUG_RESUME_PDF_FLAG } from "lib/constants";
 import {
   useRegisterReactPDFFont,
   useRegisterReactPDFHyphenationCallback,
 } from "components/fonts/hooks";
 import { NonEnglishFontsCSSLazyLoader } from "components/fonts/NonEnglishFontsCSSLoader";
+import { LayoutOverridePanel } from "components/Resume/LayoutOverridePanel";
 
 export const Resume = () => {
   const [scale, setScale] = useState(0.8);
   const resume = useAppSelector(selectResume);
   const settings = useAppSelector(selectSettings);
+  const fineTuneMode = useAppSelector(selectFineTuneMode);
+
   const document = useMemo(
     () => <ResumePDF resume={resume} settings={settings} isPDF={true} />,
     [resume, settings]
@@ -56,6 +59,7 @@ export const Resume = () => {
             fileName={resume.profile.name + " - Resume"}
           />
         </div>
+        <LayoutOverridePanel />
         <ResumeControlBarBorder />
       </div>
     </>

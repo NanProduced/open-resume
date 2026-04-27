@@ -2,6 +2,24 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
 
 export type TemplateType = "default" | "modern" | "compact";
+export type ColumnType = "sidebar" | "main" | "both";
+
+export interface SectionLayoutOverride {
+  marginTop?: string;
+  marginBottom?: string;
+  paddingTop?: string;
+  paddingBottom?: string;
+  paddingLeft?: string;
+  paddingRight?: string;
+  lineHeight?: string;
+  fontSize?: string;
+  color?: string;
+  column?: ColumnType;
+}
+
+export interface LayoutOverrides {
+  [section: string]: SectionLayoutOverride;
+}
 
 export interface Settings {
   template: TemplateType;
@@ -30,13 +48,16 @@ export interface Settings {
     skills: boolean;
     custom: boolean;
   };
+  layoutOverrides: LayoutOverrides;
+  fineTuneMode: boolean;
+  selectedSection: ShowForm | null;
 }
 
 export type ShowForm = keyof Settings["formToShow"];
 export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
 export type GeneralSetting = Exclude<
   keyof Settings,
-  "template" | "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
+  "template" | "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints" | "layoutOverrides" | "fineTuneMode" | "selectedSection"
 >;
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
@@ -73,6 +94,9 @@ export const initialSettings: Settings = {
     skills: true,
     custom: true,
   },
+  layoutOverrides: {},
+  fineTuneMode: false,
+  selectedSection: null,
 };
 
 export const settingsSlice = createSlice({
@@ -123,6 +147,17 @@ export const settingsSlice = createSlice({
         swapFormOrder(pos, newPos);
       }
     },
+    changeFormsOrderByDrag: (
+      draft,
+      action: PayloadAction<{
+        sourceIndex: number;
+        targetIndex: number;
+      }>
+    ) => {
+      const { sourceIndex, targetIndex } = action.payload;
+      const [removed] = draft.formsOrder.splice(sourceIndex, 1);
+      draft.formsOrder.splice(targetIndex, 0, removed);
+    },
     changeShowBulletPoints: (
       draft,
       action: PayloadAction<{
@@ -132,6 +167,49 @@ export const settingsSlice = createSlice({
     ) => {
       const { field, value } = action.payload;
       draft["showBulletPoints"][field] = value;
+    },
+    changeLayoutOverride: (
+      draft,
+      action: PayloadAction<{
+        section: ShowForm;
+        override: Partial<SectionLayoutOverride>;
+      }>
+    ) => {
+      const { section, override } = action.payload;
+      if (!draft.layoutOverrides[section]) {
+        draft.layoutOverrides[section] = {};
+      }
+      draft.layoutOverrides[section] = {
+        ...draft.layoutOverrides[section],
+        ...override,
+      };
+    },
+    resetSectionLayoutOverride: (
+      draft,
+      action: PayloadAction<{ section: ShowForm }>
+    ) => {
+      const { section } = action.payload;
+      if (draft.layoutOverrides[section]) {
+        delete draft.layoutOverrides[section];
+      }
+    },
+    resetLayoutOverrides: (draft) => {
+      draft.layoutOverrides = {};
+    },
+    toggleFineTuneMode: (draft) => {
+      draft.fineTuneMode = !draft.fineTuneMode;
+      if (!draft.fineTuneMode) {
+        draft.selectedSection = null;
+      }
+    },
+    setFineTuneMode: (draft, action: PayloadAction<boolean>) => {
+      draft.fineTuneMode = action.payload;
+      if (!action.payload) {
+        draft.selectedSection = null;
+      }
+    },
+    setSelectedSection: (draft, action: PayloadAction<ShowForm | null>) => {
+      draft.selectedSection = action.payload;
     },
     setSettings: (draft, action: PayloadAction<Settings>) => {
       return action.payload;
@@ -145,7 +223,14 @@ export const {
   changeShowForm,
   changeFormHeading,
   changeFormOrder,
+  changeFormsOrderByDrag,
   changeShowBulletPoints,
+  changeLayoutOverride,
+  resetSectionLayoutOverride,
+  resetLayoutOverrides,
+  toggleFineTuneMode,
+  setFineTuneMode,
+  setSelectedSection,
   setSettings,
 } = settingsSlice.actions;
 
@@ -171,5 +256,14 @@ export const selectIsLastForm = (form: ShowForm) => (state: RootState) =>
 export const selectShowBulletPoints =
   (form: FormWithBulletPoints) => (state: RootState) =>
     state.settings.showBulletPoints[form];
+
+export const selectLayoutOverrides = (state: RootState) =>
+  state.settings.layoutOverrides;
+export const selectLayoutOverrideByForm =
+  (form: ShowForm) => (state: RootState) =>
+    state.settings.layoutOverrides[form] || {};
+
+export const selectFineTuneMode = (state: RootState) => state.settings.fineTuneMode;
+export const selectSelectedSection = (state: RootState) => state.settings.selectedSection;
 
 export default settingsSlice.reducer;
