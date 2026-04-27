@@ -1,5 +1,6 @@
 import "globals.css";
 import { TopNavBar } from "components/TopNavBar";
+import ClientLayout from "components/ClientLayout";
 import { Analytics } from "@vercel/analytics/react";
 
 export const metadata = {
@@ -16,9 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <TopNavBar />
-        {children}
-        <Analytics />
+        <ClientLayout>
+          <TopNavBar />
+          {children}
+          <Analytics />
+        </ClientLayout>
       </body>
     </html>
   );
