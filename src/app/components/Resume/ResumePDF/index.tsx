@@ -1,15 +1,22 @@
-import { Page, View, Document } from "@react-pdf/renderer";
-import { styles, spacing } from "components/Resume/ResumePDF/styles";
+import { Document } from "@react-pdf/renderer";
 import { ResumePDFProfile } from "components/Resume/ResumePDF/ResumePDFProfile";
 import { ResumePDFWorkExperience } from "components/Resume/ResumePDF/ResumePDFWorkExperience";
 import { ResumePDFEducation } from "components/Resume/ResumePDF/ResumePDFEducation";
 import { ResumePDFProject } from "components/Resume/ResumePDF/ResumePDFProject";
 import { ResumePDFSkills } from "components/Resume/ResumePDF/ResumePDFSkills";
 import { ResumePDFCustom } from "components/Resume/ResumePDF/ResumePDFCustom";
-import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
-import type { Settings, ShowForm } from "lib/redux/settingsSlice";
+import { DEFAULT_FONT_COLOR, DEFAULT_TEMPLATE, type Settings, type ShowForm, type TemplateType } from "lib/redux/settingsSlice";
 import type { Resume } from "lib/redux/types";
 import { SuppressResumePDFErrorMessage } from "components/Resume/ResumePDF/common/SuppressResumePDFErrorMessage";
+import { TemplateDefault, TemplateModern, TemplateCompact } from "components/Resume/ResumePDF/templates";
+
+const TEMPLATE_TO_COMPONENT: {
+  [key in TemplateType]: (props: Parameters<typeof TemplateDefault>[0]) => JSX.Element;
+} = {
+  default: TemplateDefault,
+  modern: TemplateModern,
+  compact: TemplateCompact,
+};
 
 /**
  * Note: ResumePDF is supposed to be rendered inside PDFViewer. However,
@@ -39,13 +46,11 @@ export const ResumePDF = ({
     resume;
   const { name } = profile;
   const {
-    fontFamily,
-    fontSize,
-    documentSize,
     formToHeading,
     formToShow,
     formsOrder,
     showBulletPoints,
+    template,
   } = settings;
   const themeColor = settings.themeColor || DEFAULT_FONT_COLOR;
 
@@ -92,44 +97,19 @@ export const ResumePDF = ({
     ),
   };
 
+  const TemplateComponent = TEMPLATE_TO_COMPONENT[template || DEFAULT_TEMPLATE];
+
   return (
     <>
       <Document title={`${name} Resume`} author={name} producer={"OpenResume"}>
-        <Page
-          size={documentSize === "A4" ? "A4" : "LETTER"}
-          style={{
-            ...styles.flexCol,
-            color: DEFAULT_FONT_COLOR,
-            fontFamily,
-            fontSize: fontSize + "pt",
-          }}
-        >
-          {Boolean(settings.themeColor) && (
-            <View
-              style={{
-                width: spacing["full"],
-                height: spacing[3.5],
-                backgroundColor: themeColor,
-              }}
-            />
-          )}
-          <View
-            style={{
-              ...styles.flexCol,
-              padding: `${spacing[0]} ${spacing[20]}`,
-            }}
-          >
-            <ResumePDFProfile
-              profile={profile}
-              themeColor={themeColor}
-              isPDF={isPDF}
-            />
-            {showFormsOrder.map((form) => {
-              const Component = formTypeToComponent[form];
-              return <Component key={form} />;
-            })}
-          </View>
-        </Page>
+        <TemplateComponent
+          resume={resume}
+          settings={settings}
+          themeColor={themeColor}
+          isPDF={isPDF}
+          formTypeToComponent={formTypeToComponent}
+          showFormsOrder={showFormsOrder}
+        />
       </Document>
       <SuppressResumePDFErrorMessage />
     </>

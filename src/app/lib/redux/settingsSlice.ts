@@ -1,7 +1,10 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
 
+export type TemplateType = "default" | "modern" | "compact";
+
 export interface Settings {
+  template: TemplateType;
   themeColor: string;
   fontFamily: string;
   fontSize: string;
@@ -33,7 +36,7 @@ export type ShowForm = keyof Settings["formToShow"];
 export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
 export type GeneralSetting = Exclude<
   keyof Settings,
-  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
+  "template" | "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
 >;
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
@@ -41,7 +44,10 @@ export const DEFAULT_FONT_FAMILY = "Roboto";
 export const DEFAULT_FONT_SIZE = "11"; // text-base https://tailwindcss.com/docs/font-size
 export const DEFAULT_FONT_COLOR = "#171717"; // text-neutral-800
 
+export const DEFAULT_TEMPLATE: TemplateType = "default";
+
 export const initialSettings: Settings = {
+  template: DEFAULT_TEMPLATE,
   themeColor: DEFAULT_THEME_COLOR,
   fontFamily: DEFAULT_FONT_FAMILY,
   fontSize: DEFAULT_FONT_SIZE,
@@ -79,6 +85,12 @@ export const settingsSlice = createSlice({
     ) => {
       const { field, value } = action.payload;
       draft[field] = value;
+    },
+    changeTemplate: (
+      draft,
+      action: PayloadAction<TemplateType>
+    ) => {
+      draft.template = action.payload;
     },
     changeShowForm: (
       draft,
@@ -129,6 +141,7 @@ export const settingsSlice = createSlice({
 
 export const {
   changeSettings,
+  changeTemplate,
   changeShowForm,
   changeFormHeading,
   changeFormOrder,
@@ -137,6 +150,7 @@ export const {
 } = settingsSlice.actions;
 
 export const selectSettings = (state: RootState) => state.settings;
+export const selectTemplate = (state: RootState) => state.settings.template;
 export const selectThemeColor = (state: RootState) => state.settings.themeColor;
 
 export const selectFormToShow = (state: RootState) => state.settings.formToShow;
