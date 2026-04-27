@@ -1,9 +1,8 @@
 import { Page, View } from "@react-pdf/renderer";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import { ResumePDFProfile } from "components/Resume/ResumePDF/ResumePDFProfile";
-import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
+import { DEFAULT_FONT_COLOR, type ShowForm, type ColumnType } from "lib/redux/settingsSlice";
 import type { TemplateProps } from "./types";
-import type { ShowForm, ColumnType } from "lib/redux/settingsSlice";
 
 const DEFAULT_SIDEBAR_FORM: ShowForm = "skills";
 
@@ -18,6 +17,60 @@ const getFormColumn = (
   return form === DEFAULT_SIDEBAR_FORM ? "sidebar" : "main";
 };
 
+const SectionWrapper = ({
+  form,
+  fineTuneMode,
+  isPDF,
+  selectedSection,
+  onSectionSelect,
+  themeColor,
+  children,
+}: {
+  form: ShowForm;
+  fineTuneMode?: boolean;
+  isPDF: boolean;
+  selectedSection?: ShowForm | null;
+  onSectionSelect?: (section: ShowForm) => void;
+  themeColor: string;
+  children: React.ReactNode;
+}) => {
+  const shouldShowBorder = fineTuneMode && !isPDF;
+  const isSelected = selectedSection === form;
+
+  if (!shouldShowBorder) {
+    return <>{children}</>;
+  }
+
+  return (
+    <div
+      onClick={() => onSectionSelect?.(form)}
+      style={{
+        cursor: "pointer",
+        border: isSelected ? `2px solid ${themeColor}` : "1px dashed #d1d5db",
+        borderRadius: "4px",
+        margin: "-1px",
+        padding: "1px",
+        transition: "all 0.2s ease",
+        backgroundColor: isSelected ? `${themeColor}10` : "transparent",
+      }}
+      onMouseEnter={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.borderColor = themeColor;
+          e.currentTarget.style.backgroundColor = `${themeColor}08`;
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!isSelected) {
+          e.currentTarget.style.borderColor = "#d1d5db";
+          e.currentTarget.style.backgroundColor = "transparent";
+        }
+      }}
+    >
+      {children}
+    </div>
+  );
+};
+
 export const TemplateModern = ({
   resume,
   settings,
@@ -25,6 +78,9 @@ export const TemplateModern = ({
   isPDF,
   formTypeToComponent,
   showFormsOrder,
+  fineTuneMode,
+  onSectionSelect,
+  selectedSection,
 }: TemplateProps) => {
   const { profile } = resume;
   const { fontFamily, fontSize, documentSize, formToShow, layoutOverrides } = settings;
@@ -77,7 +133,19 @@ export const TemplateModern = ({
             />
             {sidebarFormsOrder.map((form) => {
               const Component = formTypeToComponent[form];
-              return <Component key={form} />;
+              return (
+                <SectionWrapper
+                  key={form}
+                  form={form}
+                  fineTuneMode={fineTuneMode}
+                  isPDF={isPDF}
+                  selectedSection={selectedSection}
+                  onSectionSelect={onSectionSelect}
+                  themeColor={themeColor}
+                >
+                  <Component />
+                </SectionWrapper>
+              );
             })}
           </View>
         )}
@@ -91,7 +159,19 @@ export const TemplateModern = ({
           >
             {mainContentFormsOrder.map((form) => {
               const Component = formTypeToComponent[form];
-              return <Component key={form} />;
+              return (
+                <SectionWrapper
+                  key={form}
+                  form={form}
+                  fineTuneMode={fineTuneMode}
+                  isPDF={isPDF}
+                  selectedSection={selectedSection}
+                  onSectionSelect={onSectionSelect}
+                  themeColor={themeColor}
+                >
+                  <Component />
+                </SectionWrapper>
+              );
             })}
           </View>
         )}

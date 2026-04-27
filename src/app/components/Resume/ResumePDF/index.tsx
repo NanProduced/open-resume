@@ -37,10 +37,16 @@ export const ResumePDF = ({
   resume,
   settings,
   isPDF = false,
+  fineTuneMode,
+  onSectionSelect,
+  selectedSection,
 }: {
   resume: Resume;
   settings: Settings;
   isPDF?: boolean;
+  fineTuneMode?: boolean;
+  onSectionSelect?: (section: ShowForm) => void;
+  selectedSection?: ShowForm | null;
 }) => {
   const { profile, workExperiences, educations, projects, skills, custom } =
     resume;
@@ -115,6 +121,9 @@ export const ResumePDF = ({
           isPDF={isPDF}
           formTypeToComponent={formTypeToComponent}
           showFormsOrder={showFormsOrder}
+          fineTuneMode={fineTuneMode}
+          onSectionSelect={onSectionSelect}
+          selectedSection={selectedSection}
         />
       </Document>
       <SuppressResumePDFErrorMessage />
