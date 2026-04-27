@@ -4,7 +4,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { parseResumeFromPdf } from "lib/parse-resume-from-pdf";
 import {
   getHasUsedAppBefore,
-  saveStateToLocalStorage,
+  addNewResumeToStorage,
 } from "lib/redux/local-storage";
 import { type ShowForm, initialSettings } from "lib/redux/settingsSlice";
 import { useRouter } from "next/navigation";
@@ -90,7 +90,7 @@ export const ResumeDropzone = ({
       }
     }
 
-    saveStateToLocalStorage({ resume, settings });
+    addNewResumeToStorage(resume, settings, "导入的简历");
     router.push("/resume-builder");
   };
 

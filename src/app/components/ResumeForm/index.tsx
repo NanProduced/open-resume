@@ -4,6 +4,7 @@ import {
   useAppSelector,
   useSaveStateToLocalStorageOnChange,
   useSetInitialStore,
+  useSyncCurrentResumeToStore,
 } from "lib/redux/hooks";
 import { ShowForm, selectFormsOrder } from "lib/redux/settingsSlice";
 import { ProfileForm } from "components/ResumeForm/ProfileForm";
@@ -27,6 +28,7 @@ const formTypeToComponent: { [type in ShowForm]: () => JSX.Element } = {
 export const ResumeForm = () => {
   useSetInitialStore();
   useSaveStateToLocalStorageOnChange();
+  useSyncCurrentResumeToStore();
 
   const formsOrder = useAppSelector(selectFormsOrder);
   const [isHover, setIsHover] = useState(false);

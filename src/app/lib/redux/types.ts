@@ -42,6 +42,41 @@ export interface ResumeCustom {
   descriptions: string[];
 }
 
+export interface Settings {
+  themeColor: string;
+  fontFamily: string;
+  fontSize: string;
+  documentSize: string;
+  formToShow: {
+    workExperiences: boolean;
+    educations: boolean;
+    projects: boolean;
+    skills: boolean;
+    custom: boolean;
+  };
+  formToHeading: {
+    workExperiences: string;
+    educations: string;
+    projects: string;
+    skills: string;
+    custom: string;
+  };
+  formsOrder: ShowForm[];
+  showBulletPoints: {
+    educations: boolean;
+    projects: boolean;
+    skills: boolean;
+    custom: boolean;
+  };
+}
+
+export type ShowForm = keyof Settings["formToShow"];
+export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
+export type GeneralSetting = Exclude<
+  keyof Settings,
+  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
+>;
+
 export interface Resume {
   profile: ResumeProfile;
   workExperiences: ResumeWorkExperience[];
@@ -52,3 +87,17 @@ export interface Resume {
 }
 
 export type ResumeKey = keyof Resume;
+
+export interface ResumeEntry {
+  id: string;
+  name: string;
+  resume: Resume;
+  settings: Settings;
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface MultiResumeState {
+  currentResumeId: string;
+  resumes: ResumeEntry[];
+}

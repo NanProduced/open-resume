@@ -1,40 +1,13 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
+import type {
+  Settings,
+  ShowForm,
+  FormWithBulletPoints,
+  GeneralSetting,
+} from "lib/redux/types";
 
-export interface Settings {
-  themeColor: string;
-  fontFamily: string;
-  fontSize: string;
-  documentSize: string;
-  formToShow: {
-    workExperiences: boolean;
-    educations: boolean;
-    projects: boolean;
-    skills: boolean;
-    custom: boolean;
-  };
-  formToHeading: {
-    workExperiences: string;
-    educations: string;
-    projects: string;
-    skills: string;
-    custom: string;
-  };
-  formsOrder: ShowForm[];
-  showBulletPoints: {
-    educations: boolean;
-    projects: boolean;
-    skills: boolean;
-    custom: boolean;
-  };
-}
-
-export type ShowForm = keyof Settings["formToShow"];
-export type FormWithBulletPoints = keyof Settings["showBulletPoints"];
-export type GeneralSetting = Exclude<
-  keyof Settings,
-  "formToShow" | "formToHeading" | "formsOrder" | "showBulletPoints"
->;
+export type { Settings, ShowForm, FormWithBulletPoints, GeneralSetting };
 
 export const DEFAULT_THEME_COLOR = "#38bdf8"; // sky-400
 export const DEFAULT_FONT_FAMILY = "Roboto";

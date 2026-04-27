@@ -4,10 +4,12 @@ import Link from "next/link";
 import Image from "next/image";
 import logoSrc from "public/logo.svg";
 import { cx } from "lib/cx";
+import { ResumeSwitcher } from "components/ResumeSwitcher";
 
 export const TopNavBar = () => {
   const pathName = usePathname();
   const isHomePage = pathName === "/";
+  const isBuilderPage = pathName === "/resume-builder";
 
   return (
     <header
@@ -18,15 +20,18 @@ export const TopNavBar = () => {
       )}
     >
       <div className="flex h-10 w-full items-center justify-between">
-        <Link href="/">
-          <span className="sr-only">OpenResume</span>
-          <Image
-            src={logoSrc}
-            alt="OpenResume Logo"
-            className="h-8 w-full"
-            priority
-          />
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/">
+            <span className="sr-only">OpenResume</span>
+            <Image
+              src={logoSrc}
+              alt="OpenResume Logo"
+              className="h-8 w-full"
+              priority
+            />
+          </Link>
+          {isBuilderPage && <ResumeSwitcher />}
+        </div>
         <nav
           aria-label="Site Nav Bar"
           className="flex items-center gap-2 text-sm font-medium"
