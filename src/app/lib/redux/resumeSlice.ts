@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "lib/redux/store";
 import type {
   FeaturedSkill,
+  ItemId,
   Resume,
   ResumeEducation,
   ResumeProfile,
@@ -10,6 +11,14 @@ import type {
   ResumeWorkExperience,
 } from "lib/redux/types";
 import type { ShowForm } from "lib/redux/settingsSlice";
+
+let idCounter = 0;
+
+export const generateItemId = (): ItemId => {
+  return `${Date.now()}-${++idCounter}-${Math.random()
+    .toString(36)
+    .substring(2, 9)}`;
+};
 
 export const initialProfile: ResumeProfile = {
   name: "",
@@ -20,31 +29,47 @@ export const initialProfile: ResumeProfile = {
   url: "",
 };
 
-export const initialWorkExperience: ResumeWorkExperience = {
+export const createInitialWorkExperience = (): ResumeWorkExperience => ({
+  id: generateItemId(),
   company: "",
   jobTitle: "",
   date: "",
   descriptions: [],
-};
+});
 
-export const initialEducation: ResumeEducation = {
+export const initialWorkExperience: ResumeWorkExperience =
+  createInitialWorkExperience();
+
+export const createInitialEducation = (): ResumeEducation => ({
+  id: generateItemId(),
   school: "",
   degree: "",
   gpa: "",
   date: "",
   descriptions: [],
-};
+});
 
-export const initialProject: ResumeProject = {
+export const initialEducation: ResumeEducation = createInitialEducation();
+
+export const createInitialProject = (): ResumeProject => ({
+  id: generateItemId(),
   project: "",
   date: "",
   descriptions: [],
-};
-
-export const initialFeaturedSkill: FeaturedSkill = { skill: "", rating: 4 };
-export const initialFeaturedSkills: FeaturedSkill[] = Array(6).fill({
-  ...initialFeaturedSkill,
 });
+
+export const initialProject: ResumeProject = createInitialProject();
+
+export const createInitialFeaturedSkill = (): FeaturedSkill => ({
+  id: generateItemId(),
+  skill: "",
+  rating: 4,
+});
+
+export const initialFeaturedSkill: FeaturedSkill = createInitialFeaturedSkill();
+export const initialFeaturedSkills: FeaturedSkill[] = Array(6)
+  .fill(null)
+  .map(() => createInitialFeaturedSkill());
 export const initialSkills: ResumeSkills = {
   featuredSkills: initialFeaturedSkills,
   descriptions: [],
@@ -56,10 +81,15 @@ export const initialCustom = {
 
 export const initialResumeState: Resume = {
   profile: initialProfile,
-  workExperiences: [initialWorkExperience],
-  educations: [initialEducation],
-  projects: [initialProject],
-  skills: initialSkills,
+  workExperiences: [createInitialWorkExperience()],
+  educations: [createInitialEducation()],
+  projects: [createInitialProject()],
+  skills: {
+    featuredSkills: Array(6)
+      .fill(null)
+      .map(() => createInitialFeaturedSkill()),
+    descriptions: [],
+  },
   custom: initialCustom,
 };
 
@@ -145,15 +175,15 @@ export const resumeSlice = createSlice({
       const { form } = action.payload;
       switch (form) {
         case "workExperiences": {
-          draft.workExperiences.push(structuredClone(initialWorkExperience));
+          draft.workExperiences.push(createInitialWorkExperience());
           return draft;
         }
         case "educations": {
-          draft.educations.push(structuredClone(initialEducation));
+          draft.educations.push(createInitialEducation());
           return draft;
         }
         case "projects": {
-          draft.projects.push(structuredClone(initialProject));
+          draft.projects.push(createInitialProject());
           return draft;
         }
       }
@@ -221,5 +251,56 @@ export const selectEducations = (state: RootState) => state.resume.educations;
 export const selectProjects = (state: RootState) => state.resume.projects;
 export const selectSkills = (state: RootState) => state.resume.skills;
 export const selectCustom = (state: RootState) => state.resume.custom;
+
+type LegacyResumeWorkExperience = Omit<ResumeWorkExperience, "id"> & {
+  id?: ItemId;
+};
+type LegacyResumeEducation = Omit<ResumeEducation, "id"> & { id?: ItemId };
+type LegacyResumeProject = Omit<ResumeProject, "id"> & { id?: ItemId };
+type LegacyFeaturedSkill = Omit<FeaturedSkill, "id"> & { id?: ItemId };
+
+interface LegacyResumeSkills extends Omit<ResumeSkills, "featuredSkills"> {
+  featuredSkills: LegacyFeaturedSkill[];
+}
+
+interface LegacyResume extends Omit<Resume, "workExperiences" | "educations" | "projects" | "skills"> {
+  workExperiences: LegacyResumeWorkExperience[];
+  educations: LegacyResumeEducation[];
+  projects: LegacyResumeProject[];
+  skills: LegacyResumeSkills;
+}
+
+export const migrateResumeWithIds = (
+  legacyResume: LegacyResume | Resume
+): Resume => {
+  const resume = legacyResume as Resume;
+
+  const migrated: Resume = {
+    ...resume,
+    profile: { ...resume.profile },
+    workExperiences: resume.workExperiences.map((item, index) => ({
+      ...item,
+      id: item.id || generateItemId(),
+    })),
+    educations: resume.educations.map((item, index) => ({
+      ...item,
+      id: item.id || generateItemId(),
+    })),
+    projects: resume.projects.map((item, index) => ({
+      ...item,
+      id: item.id || generateItemId(),
+    })),
+    skills: {
+      ...resume.skills,
+      featuredSkills: resume.skills.featuredSkills.map((item, index) => ({
+        ...item,
+        id: item.id || generateItemId(),
+      })),
+    },
+    custom: { ...resume.custom },
+  };
+
+  return migrated;
+};
 
 export default resumeSlice.reducer;

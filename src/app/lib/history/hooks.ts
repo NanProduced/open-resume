@@ -12,7 +12,11 @@ import {
 import { hasAnyChanges } from "lib/history/diff";
 import type { Snapshot, ResumeId } from "lib/history/types";
 import { getSnapshot } from "lib/history/indexedDB";
-import { initialResumeState, setResume } from "lib/redux/resumeSlice";
+import {
+  initialResumeState,
+  setResume,
+  migrateResumeWithIds,
+} from "lib/redux/resumeSlice";
 import { initialSettings, setSettings } from "lib/redux/settingsSlice";
 import { deepMerge } from "lib/deep-merge";
 
@@ -137,7 +141,10 @@ export const useRestoreSnapshot = () => {
         snapshot.settings
       ) as Settings;
 
-      dispatch(setResume(mergedResume));
+      // Migrate to add stable IDs for array items
+      const migratedResume = migrateResumeWithIds(mergedResume);
+
+      dispatch(setResume(migratedResume));
       dispatch(setSettings(mergedSettings));
 
       return true;

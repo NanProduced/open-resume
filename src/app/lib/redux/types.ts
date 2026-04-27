@@ -1,3 +1,5 @@
+export type ItemId = string;
+
 export interface ResumeProfile {
   name: string;
   email: string;
@@ -8,6 +10,7 @@ export interface ResumeProfile {
 }
 
 export interface ResumeWorkExperience {
+  id: ItemId;
   company: string;
   jobTitle: string;
   date: string;
@@ -15,6 +18,7 @@ export interface ResumeWorkExperience {
 }
 
 export interface ResumeEducation {
+  id: ItemId;
   school: string;
   degree: string;
   date: string;
@@ -23,12 +27,14 @@ export interface ResumeEducation {
 }
 
 export interface ResumeProject {
+  id: ItemId;
   project: string;
   date: string;
   descriptions: string[];
 }
 
 export interface FeaturedSkill {
+  id: ItemId;
   skill: string;
   rating: number;
 }
