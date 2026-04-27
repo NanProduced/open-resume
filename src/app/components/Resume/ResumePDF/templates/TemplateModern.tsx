@@ -1,9 +1,12 @@
 import { Page, View } from "@react-pdf/renderer";
 import { styles, spacing } from "components/Resume/ResumePDF/styles";
 import { ResumePDFProfile } from "components/Resume/ResumePDF/ResumePDFProfile";
-import { ResumePDFSkills } from "components/Resume/ResumePDF/ResumePDFSkills";
 import { DEFAULT_FONT_COLOR } from "lib/redux/settingsSlice";
 import type { TemplateProps } from "./types";
+import type { ShowForm } from "lib/redux/settingsSlice";
+
+const SIDEBAR_FORM_TYPES: ShowForm[] = ["skills"];
+const MAIN_CONTENT_FORM_TYPES: ShowForm[] = ["workExperiences", "educations", "projects", "custom"];
 
 export const TemplateModern = ({
   resume,
@@ -11,15 +14,20 @@ export const TemplateModern = ({
   themeColor,
   isPDF,
   formTypeToComponent,
+  showFormsOrder,
 }: TemplateProps) => {
-  const { profile, skills } = resume;
-  const { fontFamily, fontSize, documentSize, formToHeading, showBulletPoints, formToShow } = settings;
+  const { profile } = resume;
+  const { fontFamily, fontSize, documentSize, formToShow } = settings;
 
-  const sidebarForms = ["skills"] as const;
-  const mainContentForms = ["workExperiences", "educations", "projects", "custom"] as const;
+  const sidebarFormsOrder = showFormsOrder.filter((form) => 
+    SIDEBAR_FORM_TYPES.includes(form) && formToShow[form]
+  );
+  const mainContentFormsOrder = showFormsOrder.filter((form) => 
+    MAIN_CONTENT_FORM_TYPES.includes(form) && formToShow[form]
+  );
 
-  const sidebarVisible = sidebarForms.some((form) => formToShow[form]);
-  const mainContentVisible = mainContentForms.some((form) => formToShow[form]);
+  const sidebarVisible = sidebarFormsOrder.length > 0;
+  const mainContentVisible = mainContentFormsOrder.length > 0;
 
   const sidebarWidth = "32%";
   const mainWidth = "65%";
@@ -57,14 +65,10 @@ export const TemplateModern = ({
               themeColor={themeColor}
               isPDF={isPDF}
             />
-            {formToShow.skills && (
-              <ResumePDFSkills
-                heading={formToHeading["skills"]}
-                skills={skills}
-                themeColor={themeColor}
-                showBulletPoints={showBulletPoints["skills"]}
-              />
-            )}
+            {sidebarFormsOrder.map((form) => {
+              const Component = formTypeToComponent[form];
+              return <Component key={form} />;
+            })}
           </View>
         )}
 
@@ -75,8 +79,7 @@ export const TemplateModern = ({
               width: sidebarVisible ? mainWidth : "100%",
             }}
           >
-            {mainContentForms.map((form) => {
-              if (!formToShow[form]) return null;
+            {mainContentFormsOrder.map((form) => {
               const Component = formTypeToComponent[form];
               return <Component key={form} />;
             })}
